@@ -499,21 +499,24 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### showRowBar
+[todo]
 - 类型：Boolean
 - 默认值：true
 - 作用：是否显示行号区域
 
 ------------
 ### showColumnBar
+[todo]
 - 类型：Boolean
 - 默认值：true
 - 作用：是否显示列号区域
 
 ------------
 ### sheetFormulaBar
+[todo]
 - 类型：Boolean
 - 默认值：true
-- 作用：是否显示公示栏
+- 作用：是否显示公式栏
 
 ------------
 ### defaultFontSize
@@ -523,7 +526,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 
-## 钩子函数（TODO）
+## 钩子函数
 
 钩子函数应用于二次开发时，会在各个常用鼠标或者键盘操作时植入钩子，调用开发者传入的函数，起到扩展Luckysheet功能的作用。
 
@@ -532,6 +535,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 ## 单元格
 
 ### cellRenderAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：单元格渲染结束后触发
@@ -542,6 +546,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### cellHover
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：鼠标移过单元格时(hover)触发
@@ -552,6 +557,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### cellEditBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：双击单元格后触发，即在双击单元格编辑内容的时候，最先触发这个方法
@@ -562,6 +568,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### cellEditAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：双击单元格后触发，即在双击单元格编辑内容的时候，最后触发这个方法
@@ -573,6 +580,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### fireMousedown
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：单元格数据下钻自定义方法
@@ -582,6 +590,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 ## 选区
 
 ### rangeSelectBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：框选或者设置选区前触发
@@ -590,6 +599,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeSelectAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：框选或者设置选区后触发
@@ -598,6 +608,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeMoveBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：移动选区前，包括单个单元格
@@ -606,6 +617,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeMoveAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：移动选区后，包括单个单元格
@@ -615,6 +627,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeEditBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区修改前
@@ -624,6 +637,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeEditAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区修改后
@@ -634,6 +648,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeCopyBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区复制前
@@ -643,6 +658,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeCopyAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区复制后
@@ -652,6 +668,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangePasteBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区粘贴前
@@ -661,6 +678,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangePasteAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区粘贴后
@@ -671,6 +689,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeCutBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区剪切前
@@ -680,6 +699,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeCutAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区剪切后
@@ -689,6 +709,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeDeleteBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区删除前
@@ -698,6 +719,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeDeleteAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区删除后
@@ -707,6 +729,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeClearBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区清除前
@@ -716,6 +739,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangeClearAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区清除后
@@ -725,6 +749,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangePullBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区下拉前
@@ -733,6 +758,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangePullAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：选区下拉后
@@ -744,12 +770,14 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 ## 工作表
 
 ### sheetCreatekBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：创建sheet页前触发，sheet页新建也包含数据透视表新建
 
 ------------
 ### sheetCreateAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：创建sheet页后触发，sheet页新建也包含数据透视表新建
@@ -758,6 +786,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### sheetMoveBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：sheet移动前
@@ -767,6 +796,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### sheetMoveAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：sheet移动后
@@ -777,6 +807,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### sheetDeleteBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：sheet删除前
@@ -785,6 +816,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### sheetDeleteAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：sheet删除后
@@ -793,6 +825,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### sheetEditNameBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：sheet修改名称前
@@ -802,6 +835,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### sheetEditNameAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：sheet修改名称后
@@ -812,6 +846,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### sheetEditColorBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：sheet修改颜色前
@@ -821,6 +856,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### sheetEditColorAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：sheet修改颜色后
@@ -831,6 +867,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### sheetZoomBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：sheet缩放前
@@ -840,6 +877,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### sheetZoomAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：sheet缩放后
@@ -853,6 +891,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 ## 工作簿
 
 ### workbookCreateBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：表格创建之前触发。旧的钩子函数叫做`beforeCreateDom`
@@ -861,6 +900,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### workbookCreateAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：表格创建之后触发
@@ -869,6 +909,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
      
 ------------
 ### workbookDestroyBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：表格销毁之前触发
@@ -877,6 +918,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### workbookDestroyAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：表格销毁之后触发
@@ -885,6 +927,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### updated
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：每次操作更新后执行的方法,在画布渲染之后执行，即客户端每执行一次表格操作，Luckysheet将这次操作存到历史记录中后触发，撤销重做时因为也算一次操作，当然也会触发此钩子函数。
@@ -893,6 +936,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### resized
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：resize执行之后
@@ -904,6 +948,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 ## 图片
 
 ### imageInsertBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：图片插入之前
@@ -912,6 +957,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### imageInsertAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：图片插入之后
@@ -920,6 +966,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### imageUpdateBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：图片修改之前，修改的内容包括宽高、位置、裁剪等操作
@@ -928,6 +975,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### imageUpdateAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：图片修改之后，修改的内容包括宽高、位置、裁剪等操作
@@ -937,6 +985,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### imageDeleteBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：图片删除之前
@@ -945,6 +994,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### imageDeleteAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：图片删除之后
@@ -956,6 +1006,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 ## 批注
 
 ### commentInsertBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：插入批注之前
@@ -964,6 +1015,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### commentInsertAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：插入批注之后
@@ -972,6 +1024,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### commentDeleteBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：删除批注之前
@@ -980,6 +1033,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### commentDeleteAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：删除批注之后
@@ -988,6 +1042,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### commentUpdateBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：修改批注之前
@@ -996,6 +1051,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### commentUpdateAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：修改批注之后
@@ -1008,6 +1064,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 ## 数据透视表
 
 ### pivotTableEditBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：修改数据透视表之前，操作如：拖动字段等
@@ -1016,6 +1073,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### pivotTableEditAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：修改数据透视表之后，操作如：拖动字段等
@@ -1028,6 +1086,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 ## 冻结
 
 ### frozenCreateBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：设置冻结前
@@ -1036,6 +1095,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### frozenCreateAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：设置冻结后
@@ -1044,6 +1104,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### frozenCancelBefore
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：取消冻结前
@@ -1052,6 +1113,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### frozenCancelAfter
+（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：取消冻结后
