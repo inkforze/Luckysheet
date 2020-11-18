@@ -8826,6 +8826,7 @@ export default {
         bold: 'Bold (Ctrl+B)',
         italic : 'Italic (Ctrl+I)',
         strikethrough: 'Strikethrough (Alt+Shift+5)',
+        underline: 'Underline',
         textColor: 'Text color',
         chooseColor: 'choose color',
         resetColor: 'Reset',
@@ -8859,6 +8860,7 @@ export default {
         screenshot: 'Screenshot',
         splitColumn: 'Split text',
         insertImage: 'Insert image',
+        insertLink: 'Insert link',
         dataVerification: 'Data verification',
         protection:"Protect the sheet",
 
@@ -9689,6 +9691,21 @@ export default {
         fiveQuadrantDiagram: 'Five-quadrant diagram',
         fiveBoxes: '5 Boxes',
     },
+    insertLink: {
+        linkText: "Text",
+        linkType: "Link type",
+        external: "External link",
+        internal: "Internal link",
+        linkAddress: "Link address",
+        linkSheet: "Worksheet",
+        linkCell: "Cell reference",
+        linkTooltip: "Tooltip",
+        placeholder1: "Please enter the web link address",
+        placeholder2: "Please enter the cell to be quoted, example A1",
+        placeholder3: "Please enter the prompt content",
+        tooltipInfo1: "Please enter a valid link",
+        tooltipInfo2: "Please enter the correct cell reference",
+    },
     dataVerification: {
         cellRange: 'Cell range',
         selectCellRange: 'Click to select a cell range',
@@ -9979,6 +9996,9 @@ export default {
         menuItemAreas:"Print areas",
         menuItemRows:"Print title rows",
         menuItemColumns:"Print title columns",
+    },
+    edit:{
+        typing:"typing",
     }
   };
   

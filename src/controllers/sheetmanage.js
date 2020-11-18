@@ -19,6 +19,7 @@ import luckysheetsizeauto from './resize';
 import luckysheetPostil from './postil';
 import imageCtrl from './imageCtrl';
 import dataVerificationCtrl from './dataVerificationCtrl';
+import hyperlinkCtrl from './hyperlinkCtrl';
 import luckysheetFreezen from './freezen';
 import { createFilterOptions, labelFilterOptionState } from './filter';
 import { selectHightlightShow, selectionCopyShow } from './select';
@@ -28,6 +29,7 @@ import { renderChartShow } from '../expendPlugins/chart/plugin';
 import {changeSheetContainerSize, menuToolBarWidth} from './resize';
 import {zoomNumberDomBind} from './zoom';
 import menuButton from './menuButton';
+import method from '../global/method';
 
 const sheetmanage = {
     generateRandomSheetIndex: function(prefix) {
@@ -390,8 +392,11 @@ const sheetmanage = {
             $c.scrollLeft(scrollLeftpx - 10);
 
             if (c_width >= winW * 0.7) {
-                $("#luckysheet-sheet-area .luckysheet-sheets-scroll").css("display", "inline-block");
-                $("#luckysheet-sheet-container .docs-sheet-fade-left").show();
+                if(luckysheetConfigsetting.showsheetbarConfig.sheet){
+                    $("#luckysheet-sheet-area .luckysheet-sheets-scroll").css("display", "inline-block");
+                    $("#luckysheet-sheet-container .docs-sheet-fade-left").show();
+                }
+                
             }
         }, 1)
     },
@@ -719,7 +724,7 @@ const sheetmanage = {
 
             Store.luckysheetTableContentHW = [
                 $("#luckysheet-cell-main").width() + Store.rowHeaderWidth - Store.cellMainSrollBarSize, 
-                $("#luckysheet-cell-main").height() + Store.columeHeaderHeight - Store.cellMainSrollBarSize
+                $("#luckysheet-cell-main").height() + Store.columnHeaderHeight - Store.cellMainSrollBarSize
             ];
             $("#luckysheetTableContent, #luckysheetTableContentF").attr({ 
                 width: Math.ceil(Store.luckysheetTableContentHW[0] * Store.devicePixelRatio), 
@@ -836,6 +841,11 @@ const sheetmanage = {
                         sheetindex.push(item);
                     }
 
+                    // No request is sent if it is not linked to other worksheets
+                    if(sheetindex.length === 0){
+                        execF();
+                        return;
+                    }
                     $.post(loadSheetUrl, {"gridKey" : server.gridKey, "index": sheetindex.join(",")}, function (d) {
                         let dataset = eval("(" + d + ")");
                         
@@ -930,6 +940,10 @@ const sheetmanage = {
         //数据验证
         dataVerificationCtrl.dataVerification = file.dataVerification;
         dataVerificationCtrl.init();
+
+        //链接
+        hyperlinkCtrl.hyperlink = file.hyperlink;
+        hyperlinkCtrl.init();
         
         createFilterOptions(file["filter_select"], file["filter"]);
     },
@@ -1332,7 +1346,7 @@ const sheetmanage = {
         $("#luckysheet-cols-h-cells_0").css("width", Store.ch_width); //width更新
 
         $("#luckysheet-scrollbar-x div").width(Store.ch_width);
-        $("#luckysheet-scrollbar-y div").height(Store.rh_height + Store.columeHeaderHeight - Store.cellMainSrollBarSize - 3);
+        $("#luckysheet-scrollbar-y div").height(Store.rh_height + Store.columnHeaderHeight - Store.cellMainSrollBarSize - 3);
 
         //等待滚动条dom宽高计算完成后 初始化该表格滚动位置
         let index = this.getSheetIndex(Store.currentSheetIndex);
@@ -1409,8 +1423,11 @@ const sheetmanage = {
         });
 
         if (c_width >= containerW) {
-            $("#luckysheet-sheet-area .luckysheet-sheets-scroll").css("display", "inline-block");
-            $("#luckysheet-sheet-container .docs-sheet-fade-left").show();
+            if(luckysheetConfigsetting.showsheetbarConfig.sheet){
+                $("#luckysheet-sheet-area .luckysheet-sheets-scroll").css("display", "inline-block");
+                $("#luckysheet-sheet-container .docs-sheet-fade-left").show();
+            }
+            
         }
         else{
             $("#luckysheet-sheet-area .luckysheet-sheets-scroll").css("display", "none");
