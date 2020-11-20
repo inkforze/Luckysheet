@@ -2356,7 +2356,7 @@ export default function luckysheetHandler() {
                         col = col_location[1],
                         col_pre = col_location[0],
                         col_index = col_location[2];
-
+                    
                     if ((x + 3) - Store.luckysheet_cols_change_size_start[0] > 30 && x < winW + scrollLeft - 100) {
                         $("#luckysheet-change-size-line").css({ "left": x });
                         $("#luckysheet-cols-change-size").css({ "left": x - 2 });
@@ -3634,7 +3634,7 @@ export default function luckysheetHandler() {
             let images = imageCtrl.moveChangeSize("row", Store.luckysheet_rows_change_size_start[1], size);
 
             if (Store.clearjfundo) {
-                Store.jfundo = [];
+                Store.jfundo.length  = 0;
 
                 Store.jfredo.push({
                     "type": "resize",
@@ -3736,7 +3736,7 @@ export default function luckysheetHandler() {
             let images = imageCtrl.moveChangeSize("column", Store.luckysheet_cols_change_size_start[1], size);
 
             if (Store.clearjfundo) {
-                Store.jfundo = [];
+                Store.jfundo.length  = 0;
 
                 Store.jfredo.push({
                     "type": "resize",

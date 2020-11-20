@@ -71,7 +71,7 @@ function showsheetconfigmenu() {
                     redo["oldcolor"] = oldcolor;
                     redo["color"] = color;
                     
-                    Store.jfundo = [];
+                    Store.jfundo.length  = 0;
                     Store.jfredo.push(redo);
                 }
             }
@@ -96,7 +96,7 @@ function showsheetconfigmenu() {
                 redo["oldcolor"] = oldcolor;
                 redo["color"] = null;
 
-                Store.jfundo = [];
+                Store.jfundo.length  = 0;
                 Store.jfredo.push(redo);
             }
         });
@@ -206,6 +206,8 @@ export function initialSheetBar(){
         
         let $t = $(this), $cur = $(e.target);
         luckysheetsheetrightclick($t, $cur, e);
+        let result = Store.result
+        server.websocket.onmessage(result)
     });
 
     let luckysheetsheetnameeditor = function ($t) {
@@ -264,7 +266,7 @@ export function initialSheetBar(){
             redo["oldtxt"] = oldtxt;
             redo["txt"] = txt;
 
-            Store.jfundo = [];
+            Store.jfundo.length  = 0;
             Store.jfredo.push(redo);
         }
     });
