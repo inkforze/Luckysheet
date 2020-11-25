@@ -607,7 +607,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 > 使用案例可参考源码 [src/index.html](https://github.com/mengshukeji/Luckysheet/blob/master/src/index.html)
 
-## 单元格
+## 单元格渲染
 
 ### cellRenderBefore
 
@@ -655,27 +655,29 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 	- {Object} [sheet]:当前sheet对象
 	- {Object} [ctx]: 当前画布的context
 ------------
-### cellEditBefore
-（TODO）
+### cellUpdateBefore
+
 - 类型：Function
 - 默认值：null
-- 作用：双击单元格后触发，即在双击单元格编辑内容的时候，最先触发这个方法
+- 作用：更新这个单元格之前触发，`return false` 则不执行后续的更新
 - 参数：
 	- {Number} [r]: 单元格所在行数
 	- {Number} [c]: 单元格所在列数
-	- {Object} [v]: 单元格对象
+	- {Object | String | Number} [value]: 要修改的单元格内容
+	- {Boolean} [isRefresh]: 是否刷新整个表格
 
 ------------
-### cellExitEditBefore
-（TODO）
+### cellUpdated
+
 - 类型：Function
 - 默认值：null
-- 作用：退出单元格编辑状态，即保存这个单元格值之前触发
+- 作用：更新这个单元格后触发
 - 参数：
 	- {Number} [r]: 单元格所在行数
 	- {Number} [c]: 单元格所在列数
-	- {Object} [oldV]: 修改前单元格对象
-	- {Object} [newV]: 修改后单元格对象
+	- {Object} [oldValue]: 修改前的单元格对象
+	- {Object} [newValue]: 修改后的单元格对象
+	- {Boolean} [isRefresh]: 是否刷新整个表格
 
 ------------
 ### rowTitleCellRenderBefore
@@ -855,24 +857,16 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 
-## 选区
+## 选区操作（包括单元格）
 
-### rangeSelectBefore
-（TODO）
-- 类型：Function
-- 默认值：null
-- 作用：框选或者设置选区前触发
-- 参数：
-	- {Object || Array} [range]: 选区范围，可能为多个选区
+### rangeSelect
 
-------------
-### rangeSelectAfter
-（TODO）
 - 类型：Function
 - 默认值：null
 - 作用：框选或者设置选区后触发
 - 参数：
-	- {Object || Array} [range]: 选区范围，可能为多个选区
+	- {Object} [sheet]:当前sheet对象
+	- {Object | Array} [range]: 选区范围，可能为多个选区
 
 ------------
 ### rangeMoveBefore
@@ -900,7 +894,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 - 默认值：null
 - 作用：选区修改前
 - 参数：
-	- {Object || Array} [range]: 选区范围，可能为多个选区
+	- {Object | Array} [range]: 选区范围，可能为多个选区
 	- {Object} [data]: 选区范围所对应的数据
 
 ------------
@@ -910,7 +904,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 - 默认值：null
 - 作用：选区修改后
 - 参数：
-	- {Object || Array} [range]: 选区范围，可能为多个选区
+	- {Object | Array} [range]: 选区范围，可能为多个选区
     - {Object} [oldData]: 修改前选区范围所对应的数据
     - {Object} [newData]: 修改后选区范围所对应的数据
 
@@ -921,7 +915,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 - 默认值：null
 - 作用：选区复制前
 - 参数：
-	- {Object || Array} [range]: 选区范围，可能为多个选区
+	- {Object | Array} [range]: 选区范围，可能为多个选区
 	- {Object} [data]: 选区范围所对应的数据
 
 ------------
@@ -931,7 +925,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 - 默认值：null
 - 作用：选区复制后
 - 参数：
-	- {Object || Array} [range]: 选区范围，可能为多个选区
+	- {Object | Array} [range]: 选区范围，可能为多个选区
 	- {Object} [data]: 选区范围所对应的数据
 
 ------------
@@ -941,7 +935,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 - 默认值：null
 - 作用：选区粘贴前
 - 参数：
-	- {Object || Array} [range]: 选区范围，可能为多个选区
+	- {Object | Array} [range]: 选区范围，可能为多个选区
 	- {Object} [data]: 要被粘贴的选区范围所对应的数据
 
 ------------
@@ -951,7 +945,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 - 默认值：null
 - 作用：选区粘贴后
 - 参数：
-	- {Object || Array} [range]: 选区范围，可能为多个选区
+	- {Object | Array} [range]: 选区范围，可能为多个选区
 	- {Object} [originData]: 要被粘贴的选区范围所对应的数据
 	- {Object} [pasteData]: 要粘贴的数据
 
@@ -1002,7 +996,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 - 默认值：null
 - 作用：选区清除前
 - 参数：
-	- {Object || Array} [range]: 选区范围，可能为多个选区
+	- {Object | Array} [range]: 选区范围，可能为多个选区
 	- {Object} [data]: 要被清除的选区范围所对应的数据
 
 ------------
@@ -1012,7 +1006,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 - 默认值：null
 - 作用：选区清除后
 - 参数：
-	- {Object || Array} [range]: 选区范围，可能为多个选区
+	- {Object | Array} [range]: 选区范围，可能为多个选区
 	- {Object} [data]: 被清除的选区范围所对应的数据
 
 ------------
@@ -1155,22 +1149,15 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 	- {String} [newZoom]: 修改后当前sheet页缩放比例
 
 ------------
-### sheetActivateBefore
-（TODO）
+### sheetActivate
+
 - 类型：Function
 - 默认值：null
 - 作用：激活工作表前
 - 参数：
 	- {Number} [i]: sheet页的`index`
-
-------------
-### sheetActivateAfter
-（TODO）
-- 类型：Function
-- 默认值：null
-- 作用：激活工作表后
-- 参数：
-	- {Number} [i]: sheet页的`index`
+	- {Boolean} [isPivotInitial]: 是否切换到了数据透视表页
+	- {Boolean} [isNewSheet]: 是否新建了sheet页
 
 ------------
 ### sheetDeactivateBefore
@@ -1310,56 +1297,67 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 ## 批注
 
 ### commentInsertBefore
-（TODO）
+
 - 类型：Function
 - 默认值：null
-- 作用：插入批注之前
+- 作用：插入批注之前，`return false` 则不插入批注
 - 参数：
-	- {Object} [cell]: 要插入的批注所在的单元格信息，如：`{ r:0,c:2,v:{m:'233',v:'233'}}`
+	- {Number} [r]:单元格所在行号
+	- {Number} [c]:单元格所在列号
 
 ------------
 ### commentInsertAfter
-（TODO）
+
 - 类型：Function
 - 默认值：null
 - 作用：插入批注之后
 - 参数：
+	- {Number} [r]:单元格所在行号
+	- {Number} [c]:单元格所在列号
 	- {Object} [cell]: 被插入批注所在的单元格信息，如：`{ r:0,c:2,v:{m:'233',v:'233'}}`，包含批注信息
     
 ------------
 ### commentDeleteBefore
-（TODO）
+
 - 类型：Function
 - 默认值：null
-- 作用：删除批注之前
+- 作用：删除批注之前，`return false` 则不删除批注
 - 参数：
-	- {Object} [cell]: 要删除的批注所在的单元格信息，如：`{ r:0,c:2,v:{m:'233',v:'233'}}`
+	- {Number} [r]:单元格所在行号
+	- {Number} [c]:单元格所在列号
+	- {Object} [cell]: 要删除的批注所在的单元格信息，如：`{ r:0,c:2,v:{m:'233',v:'233'}}`，可以看到批注信息
 
 ------------
 ### commentDeleteAfter
-（TODO）
+
 - 类型：Function
 - 默认值：null
 - 作用：删除批注之后
 - 参数：
-	- {Object} [cell]: 被删除批注所在的单元格信息，如：`{ r:0,c:2,v:{m:'233',v:'233'}}`
+	- {Number} [r]:单元格所在行号
+	- {Number} [c]:单元格所在列号
+	- {Object} [cell]: 被删除批注所在的单元格信息，如：`{ r:0,c:2,v:{m:'233',v:'233'}}`，可以看到批注已被删除
     
 ------------
 ### commentUpdateBefore
-（TODO）
+
 - 类型：Function
 - 默认值：null
-- 作用：修改批注之前
+- 作用：修改批注之前，`return false` 则不修改批注
 - 参数：
-	- {Object} [cell]: 批注所在的单元格信息，如：`{ r:0,c:2,v:{m:'233',v:'233'}}`
+	- {Number} [r]:单元格所在行号
+	- {Number} [c]:单元格所在列号
+	- {String} [value]: 新的批注内容
 
 ------------
 ### commentUpdateAfter
-（TODO）
+
 - 类型：Function
 - 默认值：null
 - 作用：修改批注之后
 - 参数：
+	- {Number} [r]:单元格所在行号
+	- {Number} [c]:单元格所在列号
 	- {Object} [oldCell]: 修改前批注所在的单元格信息，如：`{ r:0,c:2,v:{m:'233',v:'233'}}`
 	- {Object} [newCell]: 修改后批注所在的单元格信息，如：`{ r:0,c:2,v:{m:'233',v:'233'}}`
     
