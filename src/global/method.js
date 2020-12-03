@@ -354,7 +354,7 @@ const method = {
         let file = Store.luckysheetfile[getSheetIndex(index)];
 
         $.post(url, param, function (d) {
-            let dataset = eval("(" + d + ")");
+            let dataset = new Function("return " + d)();
             file.celldata = dataset[index.toString()];
             let data = sheetmanage.buildGridData(file);
 
@@ -491,9 +491,6 @@ const method = {
                 dataVerificationCtrl[key] = defaultDataVerification[key];
             }
         }
-
-        
-
     },
     editorChart:function(c){
         let chart_selection_color = luckyColor[0];
