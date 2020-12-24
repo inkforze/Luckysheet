@@ -74,6 +74,8 @@ luckysheet.create = function (setting) {
     Store.fullscreenmode = extendsetting.fullscreenmode;
     Store.lang = extendsetting.lang; //language
     Store.allowEdit = extendsetting.allowEdit;
+    Store.limitSheetNameLength =  extendsetting.limitSheetNameLength;
+    Store.defaultSheetNameMaxLength = extendsetting.defaultSheetNameMaxLength;
     Store.fontList = extendsetting.fontList;
     server.gridKey = extendsetting.gridKey;
     server.loadUrl = extendsetting.loadUrl;
@@ -134,6 +136,9 @@ luckysheet.create = function (setting) {
 
     if (Store.lang === 'zh') flatpickr.localize(Mandarin.zh);
 
+    // Store the currently used plugins for monitoring asynchronous loading
+    Store.asyncLoad.push(...luckysheetConfigsetting.plugins);
+    
     // Register plugins
     initPlugins(extendsetting.plugins , extendsetting.data);
 

@@ -8,13 +8,15 @@ import menuButton from './menuButton';
 import { createFilterOptions } from './filter';
 import luckysheetFreezen from './freezen';
 import luckysheetPostil from './postil';
+import imageCtrl from './imageCtrl';
+import dataVerificationCtrl from './dataVerificationCtrl';
+import hyperlinkCtrl from './hyperlinkCtrl';
 import { getObjType, replaceHtml, getByteLen } from '../utils/util';
 import { getSheetIndex } from '../methods/get';
 import Store from '../store';
 import { collaborativeEditBox } from './select'
 import locale from '../locale/locale';
 import dayjs from "dayjs";
-import imageCtrl from './imageCtrl';
 import json from '../global/json';
 
 const server = {
@@ -23,7 +25,8 @@ const server = {
     updateUrl: null,
     updateImageUrl: null,
     title: null,
-    loadSheetUrl: null,
+		loadSheetUrl: null,
+		retryTimer:null,
     allowUpdate: false, //共享编辑模式
     historyParam: function(data, sheetIndex, range) {
     	let _this = this;
@@ -151,17 +154,21 @@ const server = {
         let _this = this;
 
         if('WebSocket' in window){
-	        _this.websocket = new WebSocket(_this.updateUrl + "?t=111&g=" + encodeURIComponent(_this.gridKey));
+			let wxUrl = _this.updateUrl + "?t=111&g=" + encodeURIComponent(_this.gridKey);
+			if(_this.updateUrl.indexOf('?') > -1){
+				wxUrl = _this.updateUrl + "&t=111&g=" + encodeURIComponent(_this.gridKey);
+			}
+
+	        _this.websocket = new WebSocket(wxUrl);
 
 	        //连接建立时触发
 	        _this.websocket.onopen = function() {
-
-	        console.info(locale().websocket.success);
-	        hideloading();
-				  _this.wxErrorCount = 0;
+	        	console.info(locale().websocket.success);
+	        	hideloading();
+				_this.wxErrorCount = 0;
 				
 	            //防止websocket长时间不发送消息导致断连
-	            setInterval(function(){
+				_this.retryTimer = setInterval(function(){
 	                _this.websocket.send("rub");
 	            }, 60000);
 	        }
@@ -169,7 +176,7 @@ const server = {
 	        //客户端接收服务端数据时触发
 	        _this.websocket.onmessage = function(result){
 				Store.result = result
-				let data = eval('(' + result.data + ')');
+				let data = new Function("return " + result.data)();
 				console.info(data);
 				let type = data.type;
 				let {message,id} = data;
@@ -319,10 +326,14 @@ const server = {
 	        }
 
 	        //连接关闭时触发
-	        _this.websocket.onclose = function(){
+	        _this.websocket.onclose = function(e){
 				console.info(locale().websocket.close);
-				
-	            alert(locale().websocket.contact);
+				if(e.code === 1000){
+					clearInterval(_this.retryTimer)
+					_this.retryTimer = null
+				}else{
+					alert(locale().websocket.contact);
+				}
 	        }
 	    }
 	    else{
@@ -517,12 +528,31 @@ const server = {
 	                }, 1);
 	            }
 			}
+			else if(k == "images"){ //图片
+				if(index == Store.currentSheetIndex){
+					imageCtrl.images = value;
+					imageCtrl.allImagesShow();
+					imageCtrl.init();
+				}
+			}
+			else if(k == "dataVerification"){ //数据验证
+				if(index == Store.currentSheetIndex){
+					dataVerificationCtrl.dataVerification = value;
+        			dataVerificationCtrl.init();
+				}
+			}
+			else if(k == "hyperlink"){ //链接
+				if(index == Store.currentSheetIndex){
+					hyperlinkCtrl.hyperlink = value;
+        			hyperlinkCtrl.init();
+				}
+			}
 	    }
 	    else if(type == "fc"){ //函数链calc
 	        let op = item.op, pos = item.pos;
 
 	        if(getObjType(value) != "object"){
-	            value = eval('('+ value +')');
+				value = new Function("return " + value)();
 	        }
 
 	        let r = value.r, c = value.c;
@@ -623,19 +653,42 @@ const server = {
 	        let rc = item.rc,
 	        	st_i = value.index,
 	        	len = value.len,
-	        	addData = value.data,
+				addData = value.data,
+				direction = value.direction,
 	        	mc = value.mc,
 	        	borderInfo = value.borderInfo;
-	        let data = file.data;
+	        let data = $.extend(true, [], file.data);
 
 	        if(rc == "r"){
-	            file["row"] += len;
+				file["row"] += len;
+				
+				//空行模板
+				let row = [];
+				for(let c = 0; c < data[0].length; c++){
+					row.push(null);
+				}
 
 	            let arr = [];
 	            for(let i = 0; i < len; i++){
-	                arr.push(JSON.stringify(addData[i]));
-	            }
-      				new Function("data","return " + 'data.splice(' + st_i + ', 0, ' + arr.join(",") + ')')(data);
+					if(addData[i] == null){
+						arr.push(JSON.stringify(row));
+					}
+					else{
+						arr.push(JSON.stringify(addData[i]));
+					}
+				}
+
+				if(direction == "lefttop"){
+					if(st_i == 0){
+						new Function("data","return " + 'data.unshift(' + arr.join(",") + ')')(data);
+					}
+					else{
+						new Function("data","return " + 'data.splice(' + st_i + ', 0, ' + arr.join(",") + ')')(data);
+					}
+				}
+				else{ 
+					new Function("data","return " + 'data.splice(' + (st_i + 1) + ', 0, ' + arr.join(",") + ')')(data); 
+				}
 	        }
 	        else{
 	            file["column"] += len;
@@ -650,6 +703,7 @@ const server = {
 	            data[r][c].mc = mc[x];
 	        }
 
+			file.data = data;
 	        file["config"].merge = mc;
 	        file["config"].borderInfo = borderInfo;
 
@@ -995,7 +1049,7 @@ const server = {
             // console.log("request");
             if(_this.updateUrl != ""){
                 $.post(_this.updateUrl, { compress: iscommpress, gridKey: _this.gridKey, data: params }, function (data) {
-                    let re = eval('('+ data +')')
+					let re = new Function("return " + data)();
                     if(re.status){
                         $("#luckysheet_info_detail_update").html("最近存档时间:"+ dayjs().format("M-D H:m:s"));
                         $("#luckysheet_info_detail_save").html("同步成功");
@@ -1055,7 +1109,7 @@ const server = {
             if(_this.updateImageUrl != ""){
                 // $.post(_this.updateImageUrl, { compress: true, gridKey: _this.gridKey, data:data1  }, function (data) {
                 $.post(_this.updateImageUrl, { compress: false, gridKey: _this.gridKey, data:data1  }, function (data) {
-                    let re = eval('('+ data +')')
+					let re = new Function("return " + data)();
                     if(re.status){
                         imageRequestLast = dayjs();
                     }

@@ -74,6 +74,8 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 - 列标题区域的高度 [columnHeaderHeight](#columnHeaderHeight)
 - 是否显示公式栏 [sheetFormulaBar](#sheetFormulaBar)
 - 初始化默认字体大小 [defaultFontSize](#defaultFontSize)
+- 是否限制工作表名长度 [limitSheetNameLength](#limitSheetNameLength)
+- 默认允许工作表名的最大长度 [defaultSheetNameMaxLength](#defaultSheetNameMaxLength)
 
 ### container
 - 类型：String
@@ -90,7 +92,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 ### lang
 - 类型：String
 - 默认值："en"
-- 作用：国际化设置，允许设置表格的语言，支持中文("zh")和英文("en")
+- 作用：国际化设置，允许设置表格的语言，支持简体中文("zh")、英文("en")、繁体中文("zh_tw")和西班牙文("es")
 
 ------------
 ### gridKey
@@ -448,9 +450,55 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### userInfo
-- 类型：String
-- 默认值：`'<i style="font-size:16px;color:#ff6a00;" class="fa fa-taxi" aria-hidden="true"></i> rabbit'`
-- 作用：右上角的用户信息展示样式
+- 类型：String | Boolean | Object
+- 默认值：false
+- 作用：右上角的用户信息展示样式，支持以下三种形式
+	1. HTML模板字符串，如：
+	
+	```js
+	options:{
+		// 其他配置
+		userInfo:'<i style="font-size:16px;color:#ff6a00;" class="fa fa-taxi" aria-hidden="true"></i> Lucky',
+	}
+	```
+
+	或者一个普通字符串，如：
+	
+	```js
+	options:{
+		// 其他配置
+		userInfo:'Lucky',
+	}
+	```
+ 
+	2. Boolean类型，如：
+   	
+	`false`:不展示
+	```js
+	options:{
+		// 其他配置
+		userInfo:false, // 不展示用户信息
+	}
+
+	```
+	`ture`:展示默认的字符串
+	```js
+	options:{
+		// 其他配置
+		userInfo:true, // 展示HTML:'<i style="font-size:16px;color:#ff6a00;" class="fa fa-taxi" aria-hidden="true"></i> Lucky'
+	}
+
+	```
+	3. 对象格式，设置 `userImage`：用户头像地址 和 `userName`：用户名，如：
+	```js
+	options:{
+		// 其他配置
+		userImage:'https://cdn.jsdelivr.net/npm/luckyresources@1.0.3/assets/img/logo/logo.png', // 头像url
+		userName:'Lucky', // 用户名
+	}
+	```
+
+	4. 注意，设置为`undefined`或者不设置，同设置`false`
 
 ------------
 ### userMenuItem
@@ -599,6 +647,20 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 
+### limitSheetNameLength
+- 类型：Boolean
+- 默认值：true
+- 作用：工作表重命名等场景下是否限制工作表名称的长度
+
+------------
+
+### defaultSheetNameMaxLength
+- 类型：Number
+- 默认值：31
+- 作用：默认允许的工作表名最大长度
+
+------------
+
 ## 钩子函数
 
 钩子函数应用于二次开发时，会在各个常用鼠标或者键盘操作时植入钩子，调用开发者传入的函数，起到扩展Luckysheet功能的作用。
@@ -607,8 +669,47 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 > 使用案例可参考源码 [src/index.html](https://github.com/mengshukeji/Luckysheet/blob/master/src/index.html)
 
-## 单元格渲染
+## 单元格
 
+### cellEditBefore
+
+- 类型：Function
+- 默认值：null
+- 作用：进入单元格编辑模式之前触发。在选中了某个单元格且在非编辑状态下，通常有以下三种常规方法触发进入编辑模式
+	   
+  - 双击单元格
+  - 敲Enter键
+  - 使用API：enterEditMode 
+
+- 参数：
+	- {Array} [range]: 当前选区范围
+
+------------
+### cellUpdateBefore
+
+- 类型：Function
+- 默认值：null
+- 作用：更新这个单元格值之前触发，`return false` 则不执行后续的更新。在编辑状态下修改了单元格之后，退出编辑模式并进行数据更新之前触发这个钩子。
+- 参数：
+	- {Number} [r]: 单元格所在行数
+	- {Number} [c]: 单元格所在列数
+	- {Object | String | Number} [value]: 要修改的单元格内容
+	- {Boolean} [isRefresh]: 是否刷新整个表格
+
+------------
+### cellUpdated
+
+- 类型：Function
+- 默认值：null
+- 作用：更新这个单元格后触发
+- 参数：
+	- {Number} [r]: 单元格所在行数
+	- {Number} [c]: 单元格所在列数
+	- {Object} [oldValue]: 修改前的单元格对象
+	- {Object} [newValue]: 修改后的单元格对象
+	- {Boolean} [isRefresh]: 是否刷新整个表格
+
+------------
 ### cellRenderBefore
 
 - 类型：Function
@@ -654,30 +755,6 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 	- {Object} [data]: 当前工作表二维数组数据
 	- {Object} [sheet]:当前sheet对象
 	- {Object} [ctx]: 当前画布的context
-------------
-### cellUpdateBefore
-
-- 类型：Function
-- 默认值：null
-- 作用：更新这个单元格之前触发，`return false` 则不执行后续的更新
-- 参数：
-	- {Number} [r]: 单元格所在行数
-	- {Number} [c]: 单元格所在列数
-	- {Object | String | Number} [value]: 要修改的单元格内容
-	- {Boolean} [isRefresh]: 是否刷新整个表格
-
-------------
-### cellUpdated
-
-- 类型：Function
-- 默认值：null
-- 作用：更新这个单元格后触发
-- 参数：
-	- {Number} [r]: 单元格所在行数
-	- {Number} [c]: 单元格所在列数
-	- {Object} [oldValue]: 修改前的单元格对象
-	- {Object} [newValue]: 修改后的单元格对象
-	- {Boolean} [isRefresh]: 是否刷新整个表格
 
 ------------
 ### rowTitleCellRenderBefore
@@ -930,7 +1007,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 
 ------------
 ### rangePasteBefore
-（TODO）
+
 - 类型：Function
 - 默认值：null
 - 作用：选区粘贴前
@@ -1182,7 +1259,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
 ## 工作簿
 
 ### workbookCreateBefore
-（TODO）
+
 - 类型：Function
 - 默认值：null
 - 作用：表格创建之前触发。旧的钩子函数叫做`beforeCreateDom`
@@ -1191,7 +1268,7 @@ Luckysheet开放了更细致的自定义配置选项，分别有
     
 ------------
 ### workbookCreateAfter
-（TODO）
+
 - 类型：Function
 - 默认值：null
 - 作用：表格创建之后触发

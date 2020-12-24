@@ -35,6 +35,7 @@ import server from './server';
 import {checkProtectionAuthorityNormal} from './protection';
 import Store from '../store';
 import locale from '../locale/locale';
+import numeral from 'numeral';
 
 const pivotTable = {
     pivotDatas: null,
@@ -2728,7 +2729,7 @@ const pivotTable = {
                     let orderby = r == 0 ? "self" : ((row[r - 1].orderby == "self" || row[r - 1].orderby == null) ? item : (showType == "column" ? item + values[parseInt(row[r - 1].orderby)].fullname : item + locale_pivotTable.valueSum));
                     
                     if(name == null){
-                        name = locale_filter.valueBlank;;
+                        name = locale_filter.valueBlank;
                     }
 
                     curentLevelarr_row.push({ "name": name, "fullname": item, "index": r, "orderby": orderby, "children": [] });

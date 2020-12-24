@@ -237,7 +237,7 @@ Luckysheet教程里采用的CDN链接是 [jsdelivr](https://www.jsdelivr.com/pac
 
 ------------
 
-## **<span style="font-size:20px;">Q</span>**怎样在vue工程里对Luckysheet进行二次开发`？
+## **<span style="font-size:20px;">Q</span>** 怎样在vue工程里对Luckysheet进行二次开发？
 
 **<span style="font-size:20px;">A</span>** [luckysheet-vue](https://github.com/mengshukeji/luckysheet-vue) 案例是提供一个应用集成的方案。
 
@@ -246,5 +246,61 @@ Luckysheet教程里采用的CDN链接是 [jsdelivr](https://www.jsdelivr.com/pac
 2. 在Vue工程里面通过 `http://localhost:3001` 引入Luckysheet使用
 
 这样的话，Luckysheet实时修改后，Vue工程里是可以看到更改的
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** 创建图表时候报错`Store.createChart`？
+
+**<span style="font-size:20px;">A</span>** 需要引入图表插件才能使用，工作簿初始化的时候应该配置图表插件使用，参考
+
+- 插件配置 [plugins](/zh/guide/config.html#配置项)
+- 或 官方demo [src/index.html](https://github.com/mengshukeji/Luckysheet/blob/master/src/index.html)
+
+通常，参考demo配置完后就可以和demo一样正常使用了，但是还是会偶现`chartmix is not defined`，这时需要在谷歌浏览器控制台的network里检查下图表的依赖是否都加载了，有5项依赖需要关注：`vue / vuex / element-ui / echarts / chartmix.umd.js`。
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** 单元格能增加自定义属性吗？
+
+**<span style="font-size:20px;">A</span>** 直接赋值到单元格对象上的自定义属性会被过滤，要想使得自定义属性生效，需要二开去除过滤属性的代码。
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** 如何输入以`'='`开头的文本？例如`=currentDate('YYYY-MM-DD')`，它默认会去掉函数，函数怎么禁止？
+
+**<span style="font-size:20px;">A</span>** 前面加一个单引号就行，会强制识别为字符串，和excel表现一致的。比如：`'=currentDate('YYYY-MM-DD')`
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** create回调为什么没有效果？
+
+**<span style="font-size:20px;">A</span>** API 方法`luckysheet.create()`这个方法没有回调，但是Luckysheet提供了钩子函数用于在指定位置执行回调方法，比如：
+- 表格创建之前触发 [workbookCreateBefore](/zh/guide/config.html#workbookcreatebefore)
+- 表格创建之后触发 [workbookCreateAfter](/zh/guide/config.html#workbookcreateafter)
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** create的时候默认选中第一个单元格，怎么去除？
+
+**<span style="font-size:20px;">A</span>** 选中单元格时默认是高亮，把高亮去除即可，使用API: [setRangeShow](/zh/guide/api.html#setrangeshow-range-setting)
+
+```js
+luckysheet.setRangeShow("A2",{show:false})
+```
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** 右键事件绑定在哪？
+
+**<span style="font-size:20px;">A</span>** 在源码的 [src/controllers/hander.js](https://github.com/mengshukeji/Luckysheet/blob/master/src/controllers/handler.js) 搜索`event.which == "3"`即可找到右键事件触发执行的代码。
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** 如何添加自定义工具栏？
+
+**<span style="font-size:20px;">A</span>** 暂未提供配置，可以参照工具栏打印按钮的实现来修改源码：
+1. 全局搜索 `luckysheet-icon-print`即可找到打印按钮的实现，在 [src/controllers/constant.js](https://github.com/mengshukeji/Luckysheet/blob/master/src/controllers/constant.js) 中增加一个类似的模板字符串，需要自定义一个唯一id
+2. 修改 [src/controllers/resize.js](https://github.com/mengshukeji/Luckysheet/blob/master/src/controllers/resize.js) ，在toobarConfig对象中新增一条记录
+3. 修改 [src/controllers/menuButton.js](https://github.com/mengshukeji/Luckysheet/blob/master/src/controllers/menuButton.js) ，新增一个事件监听
 
 ------------

@@ -247,3 +247,57 @@ If directly developed locally:
 In this case, after Luckysheet is modified in real time, the changes can be seen in the Vue project
 
 ------------
+
+## **<span style="font-size:20px;">Q</span>** Error reporting `Store.createChart` when creating chart?
+
+**<span style="font-size:20px;">A</span>** You need to introduce a chart plugin to use it. You should configure the chart plugin to use when the workbook is initialized. Refer to
+
+- Plugins configuration [plugins](/guide/config.html#plugins)
+- 或 官方demo [src/index.html](https://github.com/mengshukeji/Luckysheet/blob/master/src/index.html)
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** Can cells add custom attributes?
+
+**<span style="font-size:20px;">A</span>** The custom attributes directly assigned to the cell object will be filtered. To make the custom attributes take effect, you need to edit the code to remove the filter attributes.
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** How to enter text starting with `'='`? For example, `=currentDate('YYYY-MM-DD')`, it will remove the function by default, how to prohibit the function?
+
+**<span style="font-size:20px;">A</span>** Just add a single quotation mark in front of it, and it will be forcibly recognized as a string, which is consistent with excel. For example: `'=currentDate('YYYY-MM-DD')`
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** Why does the create callback have no effect?
+
+**<span style="font-size:20px;">A</span>** The API method `luckysheet.create()` does not have a callback, but Luckysheet provides a hook function to execute the callback method at a specified location, such as:
+- Triggered before the workbook is created [workbookCreateBefore](/guide/config.html#workbookcreatebefore)
+- Triggered after the workbook is created [workbookCreateAfter](/guide/config.html#workbookcreateafter)
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** When create, the first cell is selected by default, how to remove it?
+
+**<span style="font-size:20px;">A</span>** When the cell is selected, it is highlighted by default, just remove the highlight, use API: [setRangeShow](/guide/api.html#setrangeshow-range-setting)
+
+```js
+luckysheet.setRangeShow("A2",{show:false})
+```
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** Where is the right-click event bound?
+
+**<span style="font-size:20px;">A</span>** In the source code [src/controllers/hander.js](https://github.com/mengshukeji/Luckysheet/blob/master/src/controllers/handler.js), search for `event.which == "3"` to find the code executed by the right-click event.
+
+------------
+
+## **<span style="font-size:20px;">Q</span>** How to add a custom toolbar?
+
+**<span style="font-size:20px;">A</span>** No configuration is currently provided, you can refer to the implementation of the print button in the toolbar to modify the source code:
+1. Search for `luckysheet-icon-print` globally to find the implementation of the print button, in [src/controllers/constant.js](https://github.com/mengshukeji/Luckysheet/blob/master/src/controllers/constant.js) add a similar template string, you need to customize a unique id
+2. Modify [src/controllers/resize.js](https://github.com/mengshukeji/Luckysheet/blob/master/src/controllers/resize.js) and add a new record in the toobarConfig object
+3. Modify [src/controllers/menuButton.js](https://github.com/mengshukeji/Luckysheet/blob/master/src/controllers/menuButton.js) to add an event listener
+
+------------

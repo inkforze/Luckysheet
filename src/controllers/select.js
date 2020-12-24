@@ -6,6 +6,7 @@ import browser from '../global/browser';
 import dataVerificationCtrl from './dataVerificationCtrl';
 import { getSheetIndex, getRangetxt } from '../methods/get';
 import Store from '../store';
+import method from '../global/method';
 import locale from '../locale/locale';
 
 //公式函数 选区实体框
@@ -182,6 +183,14 @@ function selectHightlightShow(isRestore = false) {
     }
 
     Store.luckysheetfile[getSheetIndex(Store.currentSheetIndex)].luckysheet_select_save = Store.luckysheet_select_save;
+            // Hook function, change the range selection box, selectHightlightShowillbe triggered multiple times when mousemove is moused, and thhistoricalvalue is used here to throttle
+        const luckysheet_select_save_previous = JSON.stringify(Store.luckysheet_select_save);
+
+        if(Store.luckysheet_select_save_previous == null |Store.luckysheet_select_save_previous !== luckysheet_select_save_previous){
+            method.createHookFunction('rangeSelect', Store.luckysheetfile[getSheetIndex(Store.currentSheetIndex)], Store.luckysheet_select_save);
+        }
+        
+        Store.luckysheet_select_save_previous = luckysheet_select_save_previous;
 }
 
 //选区标题栏
@@ -422,11 +431,11 @@ function collaborativeEditBox() {
                     }
                 } else {
                     // 合并取消变成多个单元格时执行
-                    change_width = all_width[count_col[0]] - all_width[count_col[0] - 1] -1 
+                    change_width = all_width[count_col[0]] - all_width[count_col[0] - 1] - 1
                     if(count_col[0] === 0) {
                         change_width = all_width[count_col[0]] - 1
                     }
-                    change_height = all_height[count_row[0]] - all_height[count_row[0] - 1] -1 
+                    change_height = all_height[count_row[0]] - all_height[count_row[0] - 1] - 1
                     if(count_row[0] === 0) {
                         change_height = all_height[count_row[0]] - 1
                     }
@@ -458,7 +467,7 @@ function selectionCopyShow(range) {
 
             let copyDomHtml = '<div class="luckysheet-selection-copy" style="display: block; left: ' + col_pre + 'px; width: ' + (col - col_pre - 1) + 'px; top: ' + row_pre + 'px; height: ' + (row - row_pre - 1) + 'px;">' +
                 '<div class="luckysheet-selection-copy-top luckysheet-copy"></div>' +
-                '<div class="luckysheet-selection-copy-right luckysheet-copy"d></iv>' +
+                '<div class="luckysheet-selection-copy-right luckysheet-copy"></div>' +
                 '<div class="luckysheet-selection-copy-bottom luckysheet-copy"></div>' +
                 '<div class="luckysheet-selection-copy-left luckysheet-copy"></div>' +
                 '<div class="luckysheet-selection-copy-hc"></div>' +

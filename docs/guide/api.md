@@ -6,6 +6,7 @@ Use note:
 1. When script is introduced globally, all APIs are mounted under the window.luckysheet object, which can be printed and seen in the browser console; when npm is introduced, all APIs are also mounted under the luckysheet object
 2. The first parameter of the `success` callback function is the return value of the API method
 3. If you need a new API, please submit it to github [Issues](https://github.com/mengshukeji/Luckysheet/issues/new/choose), and decide whether to open the new API according to the number of likes
+4. The required `order` parameter in the API method is the value of `order` in the worksheet object, not `index`
 
 ## Cell operation
 
@@ -175,6 +176,7 @@ Use note:
         + {Boolean} [isWholeWord]: Whether to match the whole word; the default is `false`
         + {Boolean} [isCaseSensitive]: Whether to match case sensitively; the default is `false`
         + {Number} [order]: Worksheet subscript; the default value is the current worksheet subscript
+        + {String} [type]: cell attribute; the default value is `"m"`
 
 - **Explanation**：
 	
@@ -184,6 +186,8 @@ Use note:
 
     - Find the string `"value"` in the current worksheet
     `luckysheet.find("value")`
+	- Find cells in the current worksheet whose formula contains `"SUM"`
+    `luckysheet.find("SUM",{type:"f"})`
 
 ------------
 
@@ -315,6 +319,16 @@ Use note:
 	Freeze rank operation
 
 	Pay special attention to the setting of `range` in `setting` only when `isRange` is set to `true`, which is different from the general range format.
+
+	If you want to use this API to set the freeze after the workbook is initialized, you can execute it in the hook function after the workbook is created, such as:
+	```js
+	luckysheet.create({
+		hook:{
+			workbookCreateAfter:function(){
+				luckysheet.setBothFrozen(false);
+			}
+		}
+	});
 
 - **Usage**:
 
@@ -869,7 +883,6 @@ Use note:
 ------------
 
 ### getRangeJson(title [,setting])
- 
 
 - **Parameter**：
 
@@ -896,8 +909,7 @@ Use note:
 		The returned result is:
 		```json
 		[
-			{ "A": "value1", "B": "value3" },
-			{ "A": "value2", "B": "value4" }
+			{ "value1": "value2", "value3": "value4" }
 		]
 		```
 
@@ -908,7 +920,8 @@ Use note:
 		The returned result is:
 		```json
 		[
-			{ "value1": "value2", "value3": "value4" }
+			{ "A": "value1", "B": "value3" },
+			{ "A": "value2", "B": "value4" }
 		]
 		```
 
@@ -1121,8 +1134,6 @@ Use note:
 
 ### setRangeShow(range [,setting])<div id='setRangeShow'></div>
 
-[todo]
-
 - **Parameter**：
 
 	- {Array | Object | String} [range]: The range of the selection, the format of the supported selection is `"A1:B2"`, `"sheetName!A1:B2"` or `{row:[0,1],column: [0,1]}`, allows an array of multiple selections; the default is the current selection
@@ -1220,7 +1231,7 @@ Use note:
 					}
 				]
 			]
-		luckysheet.setRangeValue(data)
+		luckysheet.setRangeValue(data,{range:"A1:B2"})
 		```
 
 ------------

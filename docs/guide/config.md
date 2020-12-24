@@ -89,7 +89,7 @@ The following are all supported setting parameters
 ### lang
 - Type: String
 - Default: "en"
-- Usage: Internationalization settings, allowing to set the language of the workbook, supporting Chinese ("zh") and English ("en")
+- Usage: Internationalization settings, allow to set the language of the table, support simplified Chinese ("zh"), English ("en") and traditional Chinese ("zh_tw") and Spanish ("es")
 
 ------------
 ### gridKey
@@ -360,9 +360,54 @@ Note that you also need to configure `loadUrl` and `loadSheetUrl` to take effect
 
 ------------
 ### userInfo
-- Type: String
-- Default: `'<i style="font-size:16px;color:#ff6a00;" class="fa fa-taxi" aria-hidden="true"></i> rabbit'`
-- Usage: User information display style in the upper right corner
+- Type: String | Boolean | Object
+- Default: false
+- Usage: User information display style in the upper right corner,Support the following three formats
+	1. HTML template string, such as:
+	
+	```js
+	options:{
+		// Other configuration
+		userInfo:'<i style="font-size:16px;color:#ff6a00;" class="fa fa-taxi" aria-hidden="true"></i> Lucky',
+	}
+	```
+
+	Or an ordinary string, such as:
+	
+	```js
+	options:{
+		// Other configuration
+		userInfo:'Lucky',
+	}
+	```
+ 
+	2. Boolean type, such as:
+   	
+	`false`: Do not show
+	```js
+	options:{
+		// Other configuration
+		userInfo:false, // Do not display user information
+	}
+
+	```
+	`ture`: Show the default string
+	```js
+	options:{
+		// Other configuration
+		userInfo:true, // Show HTML:'<i style="font-size:16px;color:#ff6a00;" class="fa fa-taxi" aria-hidden="true"></i> Lucky'
+	}
+
+	```
+	3. Object format, set `userImage`: user avatar address and `userName`: user name, such as:
+	```js
+	options:{
+		// Other configuration
+		userImage:'https://cdn.jsdelivr.net/npm/luckyresources@1.0.3/assets/img/logo/logo.png', // Avatar url
+		userName:'Lucky', // username
+	}
+	```
+	4. Note that if set to `undefined` or not set, the same as setting `false`
 
 ------------
 ### userMenuItem
@@ -508,6 +553,21 @@ Note that you also need to configure `loadUrl` and `loadSheetUrl` to take effect
 
 ------------
 
+### limitSheetNameLength
+- Type: Boolean
+- Default: true
+- Usage：Is the length of the sheet name limited in scenarios such as sheet renaming
+
+------------
+
+### defaultSheetNameMaxLength
+- Type：Number
+- Default：31
+- Usage：Default maximum allowed sheet name length
+
+------------
+
+
 ## Hook Function (TODO)
 
 When the hook function is used in secondary development, hooks will be implanted in each common mouse or keyboard operation, and the function passed in by the developer will be called to expand the function of Luckysheet.
@@ -516,49 +576,148 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 
 ## Cell
 
-### cellRenderAfter
-- Type: Function
-- Default: null
-- Usage: Triggered after the cell rendering ends
-- Parameter: 
-	- {Number} [r]: Row number of cell
-	- {Number} [c]: Column number of cell
-	- {Object} [v]: Cell object
+### cellEditBefore
 
-------------
-### cellHover
 - Type: Function
 - Default: null
-- Usage: Triggered when the mouse moves over the cell (hover)
+- Usage: Triggered before entering the cell editing mode. When a cell is selected and in the non-editing state, there are usually the following three conventional methods to trigger the edit mode
+   - Double click the cell
+   - Hit Enter
+   - Use API: enterEditMode
 - Parameter: 
-	- {Number} [r]: Row number of cell
-	- {Number} [c]: Column number of cell
-	- {Object} [v]: Cell object
+	- {Array} [range]: Current selection range
 
 ------------
 ### cellUpdateBefore
 
-- Type：Function
-- Default：null
-- Usage：Triggered before updating this cell
-- Parameter：
-	- {Number} [r]: Row number of cell
-	- {Number} [c]: Column number of cell
-	- {Object | String | Number} [value]: Cell content to be modified
+- Type: Function
+- Default: null
+- Usage: Triggered before updating this cell value, `return false` will not perform subsequent updates. After modifying the cell in the editing state, this hook is triggered before exiting the editing mode and updating the data.
+- Parameter: 
+	- {Number} [r]: The row number of the cell
+	- {Number} [c]: The column number of the cell
+	- {Object | String | Number} [value]: The content of the cell to be modified
 	- {Boolean} [isRefresh]: Whether to refresh the entire table
 
 ------------
 ### cellUpdated
 
-- Type：Function
-- Default：null
-- Usage：Triggered after updating this cell
-- Parameter：
-	- {Number} [r]: Row number of cell
-	- {Number} [c]: Column number of cell
+- Type: Function
+- Default: null
+- Usage: Triggered after updating this cell
+- Parameter: 
+	- {Number} [r]: The row number of the cell
+	- {Number} [c]: The column number of the cell
 	- {Object} [oldValue]: Cell object before modification
-	- {Object} [newValue]: Cell object after modification
+	- {Object} [newValue]: Modified cell object
 	- {Boolean} [isRefresh]: Whether to refresh the entire table
+
+------------
+### cellRenderBefore
+
+- Type: Function
+- Default: null
+- Usage: Triggered before the cell is rendered, `return false` will not render the cell
+- Parameter: 
+	- {Object} [cell]:Cell object
+	- {Object} [postion]:
+		+ {Number} [r]: The row number of the cell
+		+ {Number} [c]: The column number of the cell
+		+ {Number} [start_r]: The horizontal coordinate of the upper left corner of the cell
+		+ {Number} [start_c]: The vertical coordinate of the upper left corner of the cell
+		+ {Number} [end_r]: The horizontal coordinate of the lower right corner of the cell
+		+ {Number} [end_c]: The vertical coordinate of the lower right corner of the cell
+	- {Object} [sheet]: Current sheet object
+	- {Object} [ctx]: The context of the current canvas
+
+------------
+### cellRenderAfter
+
+- Type: Function
+- Default: null
+- Usage: Triggered after the cell rendering ends, `return false` will not render the cell
+- Parameter: 
+	- {Object} [cell]: Cell object
+	- {Object} [postion]:
+		+ {Number} [r]: The row number of the cell
+		+ {Number} [c]: The column number of the cell
+		+ {Number} [start_r]: The horizontal coordinate of the upper left corner of the cell
+		+ {Number} [start_c]: The vertical coordinate of the upper left corner of the cell
+		+ {Number} [end_r]: The horizontal coordinate of the lower right corner of the cell
+		+ {Number} [end_c]: The vertical coordinate of the lower right corner of the cell
+	- {Object} [sheet]: Current worksheet object
+	- {Object} [ctx]: The context of the current canvas
+
+------------
+### cellAllRenderBefore
+
+- Type: Function
+- Default: null
+- Usage:The method executed before all cells are rendered. Internally, this method is added before `luckysheetDrawMain` renders the table.
+- Parameter: 
+	- {Object} [data]: Two-dimensional array data of the current worksheet
+	- {Object} [sheet]: Current worksheet object
+	- {Object} [ctx]: The context of the current canvas
+
+------------
+### rowTitleCellRenderBefore
+
+- Type: Function
+- Default: null
+- Usage: Triggered before the row header cell is rendered, `return false` will not render the row header
+- Parameter: 
+	- {String} [rowNum]: Row number
+	- {Object} [postion]:
+		+ {Number} [r]: The row number of the cell
+		+ {Number} [top]: The vertical coordinate of the upper left corner of the cell
+		+ {Number} [width]: Cell width
+		+ {Number} [height]: Cell height
+	- {Object} [ctx]: The context of the current canvas
+
+------------
+### rowTitleCellRenderAfter
+
+- Type: Function
+- Default: null
+- Usage: Triggered after the row header cell is rendered, `return false` will not render the row header
+- Parameter: 
+	- {String} [rowNum]: Row number
+	- {Object} [postion]:
+		+ {Number} [r]: The row number of the cell
+		+ {Number} [top]: The vertical coordinate of the upper left corner of the cell
+		+ {Number} [width]: Cell width
+		+ {Number} [height]: Cell height
+	- {Object} [ctx]: The context of the current canvas
+
+------------
+### columnTitleCellRenderBefore
+
+- Type: Function
+- Default: null
+- Usage: Triggered before the column header cell is rendered, `return false` will not render the column header
+- Parameter: 
+	- {Object} [columnAbc]: Column header characters
+	- {Object} [postion]:
+		- {Number} [c]: The column number of the cell
+		- {Number} [left]: The horizontal coordinate of the upper left corner of the cell
+		- {Number} [width]: Cell width
+		- {Number} [height]: Cell height
+	- {Object} [ctx]: The context of the current canvas
+
+------------
+### columnTitleCellRenderAfter
+
+- Type: Function
+- Default: null
+- Usage: Triggered after the column header cell is rendered, `return false` will not render the column header
+- Parameter: 
+	- {Object} [columnAbc]: Column header characters
+	- {Object} [postion]:
+		- {Number} [c]: The column number of the cell
+		- {Number} [left]: The horizontal coordinate of the upper left corner of the cell
+		- {Number} [width]: Cell width
+		- {Number} [height]: Cell height
+	- {Object} [ctx]: The context of the current canvas
 
 ------------
 
@@ -569,7 +728,7 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 - Default: null
 - Usage: Frame selection or trigger after setting selection
 - Parameter: 
-	- {Object} [sheet]: Current sheet object
+	- {Object} [sheet]: Current worksheet object
 	- {Object | Array} [range]: Selection area, may be multiple selection areas
 
 ------------
