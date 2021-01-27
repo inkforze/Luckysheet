@@ -592,33 +592,39 @@ const sheetmanage = {
         return ret;
     },
     buildGridData: function(file) {
+        // 如果已经存在二维数据data,那么直接返回data；如果只有celldata，那么就转化成二维数组data，再返回
         let row = file.row == null ? Store.defaultrowNum : file.row, 
-            column = file.column == null ? Store.defaultcolumnNum : file.column;
-        let data = datagridgrowth([], row, column);
-
-        let celldata = file.celldata;
-        if(celldata != null){
-            for(let i = 0; i < celldata.length; i++){
-                let item = celldata[i];
-                let r = item.r;
-                let c = item.c;
-                let v = item.v;
-
-                if(r >= data.length){
-                    data = datagridgrowth(data, r - data.length + 1, 0);
+            column = file.column == null ? Store.defaultcolumnNum : file.column,
+            data = file.data && file.data.length > 0 ? file.data : datagridgrowth([], row, column),
+            celldata = file.celldata;
+        if (file.data && file.data.length > 0) {
+            for (let i = 0; i < data.length; i++) {
+                for (let j = 0; j < data[0].length; j++) {
+                    setcellvalue(i, j, data, data[i][j]);
                 }
-                if(c >= data[0].length){
-                    data = datagridgrowth(data, 0, c - data[0].length + 1);
+            }
+        } else {
+            if(celldata && celldata.length > 0){
+                for(let i = 0; i < celldata.length; i++){
+                    let item = celldata[i];
+                    let r = item.r;
+                    let c = item.c;
+                    let v = item.v;
+    
+                    if(r >= data.length){
+                        data = datagridgrowth(data, r - data.length + 1, 0);
+                    }
+                    if(c >= data[0].length){
+                        data = datagridgrowth(data, 0, c - data[0].length + 1);
+                    }
+                    setcellvalue(r, c, data, v);
                 }
-                
-                setcellvalue(r, c, data, v);
             }
         }
 
         //亿万格式+精确度 恢复全局初始化
         luckysheetConfigsetting.autoFormatw = false;  
         luckysheetConfigsetting.accuracy = undefined;
-
         return data;
     },
     cutGridData: function(d) {
@@ -727,6 +733,12 @@ const sheetmanage = {
         _this.nulldata = datagridgrowth([], Store.defaultrowNum, Store.defaultcolumnNum);
         let data = _this.buildGridData(file);
 
+        //初始化的时候 记录选区
+        let select_save = [];
+        file.jfgird_select_save = file.jfgird_select_save || [];
+        file.jfgird_select_save.forEach(item=>select_save.push({"row":item.row,"column":item.column}));
+        file.luckysheet_select_save = select_save;
+        
         this.sheetParamRestore(file, data);
 
         let r2 = Store.luckysheet_select_save[0].row[1], 
@@ -811,31 +823,31 @@ const sheetmanage = {
 
                     if (!!file.isPivotTable) {
                         Store.luckysheetcurrentisPivotTable = true;
-                        pivotTable.changePivotTable(Store.currentSheetIndex);
+                        // pivotTable.changePivotTable(Store.currentSheetIndex); //此方法需要注释掉，在restoreSheetAll中已经执行了刷新了数据透视表，这里就不需要了
                     }
                     else {
                         Store.luckysheetcurrentisPivotTable = false;
                         $("#luckysheet-modal-dialog-slider-pivot").hide();
+                    }
 
-                        // Store toolbar button width value
-                        menuToolBarWidth();
+                    // Store toolbar button width value
+                    menuToolBarWidth();
 
-                        luckysheetsizeauto();
+                    luckysheetsizeauto();
 
-                        //等待滚动条dom宽高加载完成后 初始化滚动位置
-                        if(file["scrollLeft"] != null && file["scrollLeft"] > 0){
-                            $("#luckysheet-scrollbar-x").scrollLeft(file["scrollLeft"]);
-                        }
-                        else{
-                            $("#luckysheet-scrollbar-x").scrollLeft(0);
-                        }
-                
-                        if(file["scrollTop"] != null && file["scrollTop"] > 0){
-                            $("#luckysheet-scrollbar-y").scrollTop(file["scrollTop"]);
-                        }
-                        else{
-                            $("#luckysheet-scrollbar-y").scrollTop(0);
-                        }
+                    //等待滚动条dom宽高加载完成后 初始化滚动位置
+                    if(file["scrollLeft"] != null && file["scrollLeft"] > 0){
+                        $("#luckysheet-scrollbar-x").scrollLeft(file["scrollLeft"]);
+                    }
+                    else{
+                        $("#luckysheet-scrollbar-x").scrollLeft(0);
+                    }
+            
+                    if(file["scrollTop"] != null && file["scrollTop"] > 0){
+                        $("#luckysheet-scrollbar-y").scrollTop(file["scrollTop"]);
+                    }
+                    else{
+                        $("#luckysheet-scrollbar-y").scrollTop(0);
                     }
 
                     // 此处已经渲染完成表格，应该挪到前面
@@ -1145,9 +1157,8 @@ const sheetmanage = {
         _this.storeSheetParamALL();
         _this.setCurSheet(index);
 
-        let file = Store.luckysheetfile[_this.getSheetIndex(index)], 
-            data = file.data, 
-            cfg = file.config;
+        let file = Store.luckysheetfile[_this.getSheetIndex(index)]
+  
         if (!!file.isPivotTable) {
             Store.luckysheetcurrentisPivotTable = true;
             if (!isPivotInitial) {
@@ -1162,7 +1173,8 @@ const sheetmanage = {
 
         let load = file["load"];
         if (load != null) {        
-            
+            let data = _this.buildGridData(file);
+            file.data = data;
             // _this.loadOtherFile(file);
             
             _this.mergeCalculation(index);

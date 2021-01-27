@@ -73,6 +73,7 @@ The following are all supported setting parameters
 - The height of the column header area [columnHeaderHeight](#columnHeaderHeight)
 - Whether to show the formula bar [sheetFormulaBar](#sheetFormulaBar)
 - Initialize the default font size [defaultFontSize](#defaultFontSize)
+- Pager [pager](#pager)
 
 ### container
 - Type: String
@@ -567,6 +568,21 @@ Note that you also need to configure `loadUrl` and `loadSheetUrl` to take effect
 
 ------------
 
+### pager
+- Type：Object
+- Default：null
+- Usage：Pager button settings, the first version of the solution is directly used jquery plug-in [sPage](https://github.com/jvbei/sPage)
+	Clicking the paging button will trigger the hook function `onTogglePager`, which returns the current page number, which is the same as the `backFun` method of `sPage`. This pager setting is only responsible for the UI part. For the specific data request and data rendering after switching paging, please enter the `onTogglePager` custom processing in the number of hook lines.
+	```js
+	pager: {
+		pageIndex: 1, //Current page number
+		pageSize: 10, //How many rows of data are displayed on each page
+		total: 50, //Total number of rows of data
+		selectOption: [10, 20] //Options that allow setting the number of rows per page
+	}
+	```
+
+------------
 
 ## Hook Function (TODO)
 
@@ -620,7 +636,7 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 - Usage: Triggered before the cell is rendered, `return false` will not render the cell
 - Parameter: 
 	- {Object} [cell]:Cell object
-	- {Object} [postion]:
+	- {Object} [position]:
 		+ {Number} [r]: The row number of the cell
 		+ {Number} [c]: The column number of the cell
 		+ {Number} [start_r]: The horizontal coordinate of the upper left corner of the cell
@@ -638,7 +654,7 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 - Usage: Triggered after the cell rendering ends, `return false` will not render the cell
 - Parameter: 
 	- {Object} [cell]: Cell object
-	- {Object} [postion]:
+	- {Object} [position]:
 		+ {Number} [r]: The row number of the cell
 		+ {Number} [c]: The column number of the cell
 		+ {Number} [start_r]: The horizontal coordinate of the upper left corner of the cell
@@ -647,6 +663,74 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 		+ {Number} [end_c]: The vertical coordinate of the lower right corner of the cell
 	- {Object} [sheet]: Current worksheet object
 	- {Object} [ctx]: The context of the current canvas
+
+- Example:
+
+	A case of drawing two pictures in the upper left corner and lower right corner of cell D1
+	:::::: details
+	```js
+	luckysheet.create({
+            hook: {
+                cellRenderAfter: function (cell, position, sheetFile, ctx) {
+                    var r = position.r;
+                    var c = position.c;
+                    if (r === 0 && c === 3) { // Specify to process cell D1
+                        if (!window.storeUserImage) {
+                            window.storeUserImage = {}
+                        }
+						
+                        if (!window.storeUserImage[r + '_' + c]) {
+                            window.storeUserImage[r + '_' + c] = {}
+                        }
+
+                        var img = null;
+                        var imgRight = null;
+
+                        if (window.storeUserImage[r + '_' + c].image && window.storeUserImage[r + '_' + c].imgRight) {
+							
+							// Fetch directly after loading
+                            img = window.storeUserImage[r + '_' + c].image;
+                            imgRight = window.storeUserImage[r + '_' + c].imgRight;
+
+                        } else {
+
+                            img = new Image();
+                            imgRight = new Image();
+
+                            img.src = 'https://www.dogedoge.com/favicon/developer.mozilla.org.ico';
+                            imgRight.src = 'https://www.dogedoge.com/static/icons/twemoji/svg/1f637.svg';
+
+							// The picture is cached in the memory, fetched directly next time, no need to reload
+                            window.storeUserImage[r + '_' + c].image = img;
+                            window.storeUserImage[r + '_' + c].imgRight = imgRight;
+
+                        }
+
+						
+                        if (img.complete) { //Direct rendering that has been loaded
+                            ctx.drawImage(img, position.start_c, position.start_r, 10, 10);
+                        } else {
+                            img.onload = function () {
+                                ctx.drawImage(img, position.start_c, position.start_r, 10, 10);
+                            }
+
+                        }
+
+                        if (imgRight.complete) {
+                            ctx.drawImage(imgRight, position.end_c - 10, position.end_r - 10, 10, 10);
+                        } else {
+
+                            imgRight.onload = function () {
+                                ctx.drawImage(imgRight, position.end_c - 10, position.end_r - 10, 10, 10);
+                            }
+                        }
+
+                    }
+                }
+            }
+        })
+	```
+	:::
 
 ------------
 ### cellAllRenderBefore
@@ -667,7 +751,7 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 - Usage: Triggered before the row header cell is rendered, `return false` will not render the row header
 - Parameter: 
 	- {String} [rowNum]: Row number
-	- {Object} [postion]:
+	- {Object} [position]:
 		+ {Number} [r]: The row number of the cell
 		+ {Number} [top]: The vertical coordinate of the upper left corner of the cell
 		+ {Number} [width]: Cell width
@@ -682,7 +766,7 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 - Usage: Triggered after the row header cell is rendered, `return false` will not render the row header
 - Parameter: 
 	- {String} [rowNum]: Row number
-	- {Object} [postion]:
+	- {Object} [position]:
 		+ {Number} [r]: The row number of the cell
 		+ {Number} [top]: The vertical coordinate of the upper left corner of the cell
 		+ {Number} [width]: Cell width
@@ -697,7 +781,7 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 - Usage: Triggered before the column header cell is rendered, `return false` will not render the column header
 - Parameter: 
 	- {Object} [columnAbc]: Column header characters
-	- {Object} [postion]:
+	- {Object} [position]:
 		- {Number} [c]: The column number of the cell
 		- {Number} [left]: The horizontal coordinate of the upper left corner of the cell
 		- {Number} [width]: Cell width
@@ -712,7 +796,7 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 - Usage: Triggered after the column header cell is rendered, `return false` will not render the column header
 - Parameter: 
 	- {Object} [columnAbc]: Column header characters
-	- {Object} [postion]:
+	- {Object} [position]:
 		- {Number} [c]: The column number of the cell
 		- {Number} [left]: The horizontal coordinate of the upper left corner of the cell
 		- {Number} [width]: Cell width
@@ -1071,7 +1155,7 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 ### updated
 - Type: Function
 - Default: null
-- Usage: The method executed after each operation is updated is executed after the canvas rendering, that is, every time the client performs a workbook operation, Luckysheet saves the operation in the history and triggers it. When undoing and redoing, it is also an operation, of course, the hook function will be triggered.
+- Usage: The method executed after each operation is updated is executed after the canvas rendering, monitor changes in worksheet content, that is, every time the client performs a workbook operation, Luckysheet saves the operation in the history and triggers it. When undoing and redoing, it is also an operation, of course, the hook function will be triggered.
 - Parameter: 
 	- {Object} [operate]: The history information of this operation will have different history records according to different operations. Refer to the source code [History](https://github.com/mengshukeji/Luckysheet/blob/master/src/controllers/controlHistory.js )
     
@@ -1250,5 +1334,17 @@ The hook functions are uniformly configured under ʻoptions.hook`, and configura
 - Type: Function
 - Default: null
 - Usage: Customized method of drilling down cell data, note that this hook function is mounted under options: `options.fireMousedown`
+
+------------
+
+## Pager
+
+### onTogglePager
+
+- Type: Function
+- Default: null
+- Usage: Click the page button to call back the function, return the current page number, refer to [sPage backFun](https://github.com/jvbei/sPage)
+- Parameter:
+	- {Object} [page]: Return the current page object
 
 ------------

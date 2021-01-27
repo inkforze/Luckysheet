@@ -63,33 +63,45 @@ function setcellvalue(r, c, d, v) {
         return;
     }
 
-    if(isRealNull(cell)){
+    // 1.为null
+    // 2.数据透视表的数据，flowdata的每个数据可能为字符串，结果就是cell == v == 一个字符串或者数字数据
+    if(isRealNull(cell) || (getObjType(cell) === 'string' || getObjType(cell) === 'number') && cell === v){
         cell = {};
     }
     
-    if(vupdate.toString().substr(0, 1) == "'"){
-        cell.m = vupdate.toString().substr(1);
+    let vupdateStr = vupdate.toString();
+
+    if(vupdateStr.substr(0, 1) == "'"){
+        cell.m = vupdateStr.substr(1);
         cell.ct = { "fa": "@", "t": "s" };
-        cell.v = vupdate.toString().substr(1);
+        cell.v = vupdateStr.substr(1);
         cell.qp = 1;
     }
     else if(cell.qp == 1){
-        cell.m = vupdate.toString();
+        cell.m = vupdateStr;
         cell.ct = { "fa": "@", "t": "s" };
-        cell.v = vupdate.toString();
+        cell.v = vupdateStr;
     }
-    else if(vupdate.toString().toUpperCase() === "TRUE"){
+    else if(vupdateStr.toUpperCase() === "TRUE"){
         cell.m = "TRUE";
         cell.ct = { "fa": "General", "t": "b" };
+        cell.ht = cell.ht || 0;
         cell.v = true;
     }
-    else if(vupdate.toString().toUpperCase() === "FALSE"){
+    else if(vupdateStr.toUpperCase() === "FALSE"){
         cell.m = "FALSE";
         cell.ct = { "fa": "General", "t": "b" };
+        cell.ht = cell.ht || 0;
         cell.v = false;
     }
+    else if(vupdateStr.substr(-1) === "%" && isRealNum(vupdateStr.substring(0, vupdateStr.length-1))){
+            cell.ht = cell.ht || 2;
+            cell.ct = {fa: "0%", t: "n"};
+            cell.v = vupdateStr.substring(0, vupdateStr.length-1) / 100;
+            cell.m = vupdate;
+    }
     else if(valueIsError(vupdate)){
-        cell.m = vupdate.toString();
+        cell.m = vupdateStr;
         // cell.ct = { "fa": "General", "t": "e" };
         if(cell.ct!=null){
             cell.ct.t = "e";
@@ -140,7 +152,7 @@ function setcellvalue(r, c, d, v) {
             }
         }
         else if(cell.ct != null && cell.ct.fa == "@"){
-            cell.m = vupdate.toString();
+            cell.m = vupdateStr;
             cell.v = vupdate;
         }
         else if(cell.ct != null && cell.ct.fa != null && cell.ct.fa != "General"){
@@ -168,7 +180,7 @@ function setcellvalue(r, c, d, v) {
 
                 cell.v = parseFloat(vupdate);
                 cell.ct = { "fa": "General", "t": "n" };
-
+                cell.ht = cell.ht || 2;
                 if(cell.v == Infinity || cell.v == -Infinity){
                     cell.m = cell.v.toString();
                 }

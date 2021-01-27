@@ -57,8 +57,8 @@ English| [简体中文](./README-zh.md)
 For a more detailed feature list, please refer to: [Features](https://mengshukeji.github.io/LuckysheetDocs/guide/#features)
 
 ## 📖 Resources
-
-For the tutorials, learning materials and supporting solutions provided by the community, please refer to [Tutorials and Resources](https://mengshukeji.github.io/LuckysheetDocs/guide/resource.html)
+- Priority reading for new users: [User Guide](https://github.com/mengshukeji/Luckysheet/wiki/User-Guide)
+- For the tutorials, learning materials and supporting solutions provided by the community, please refer to: [Tutorials and Resources](https://mengshukeji.github.io/LuckysheetDocs/guide/resource.html)
 
 ## 📜 Changelog
 
@@ -172,6 +172,8 @@ Funds donated via Patreon go directly to support mengshukeji's work on Luckyshee
 - 张铭 ¥ 200
 - 曹治军 ¥ 1
 - *特 ¥ 10
+- **权 ¥ 9.9
+- **sdmq ¥ 20
 
 ## Authors and acknowledgment
 
@@ -195,6 +197,7 @@ Funds donated via Patreon go directly to support mengshukeji's work on Luckyshee
 - [@swen-xiong](https://github.com/swen-xiong)
 - [@lzmch](https://github.com/lzmch)
 - [@kdevilpf](https://github.com/kdevilpf)
+- [@WJWM0316](https://github.com/WJWM0316)
 
 ## License
 [MIT](http://opensource.org/licenses/MIT)

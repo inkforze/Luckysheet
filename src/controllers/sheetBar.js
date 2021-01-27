@@ -16,7 +16,7 @@ import {selectTextDom} from '../global/cursorPos';
 import locale from '../locale/locale';
 import Store from '../store';
 import luckysheetConfigsetting from './luckysheetConfigsetting';
-
+import {pagerInit} from '../global/api'
 
 
 //表格底部名称栏区域 相关事件（增、删、改、隐藏显示、颜色等等）
@@ -123,11 +123,6 @@ function showsheetconfigmenu() {
 }
 
 let luckysheetsheetrightclick = function ($t, $cur, e) {
-    //保存正在编辑的单元格内容
-    if (parseInt($("#luckysheet-input-box").css("top")) > 0) {
-        formula.updatecell(Store.luckysheetCellUpdate[0], Store.luckysheetCellUpdate[1]);
-    }
-
     clearTimeout(jfdbclicklagTimeout);
     if ($cur.hasClass("luckysheet-sheets-item-name") && $cur.attr("contenteditable") == "true") {
         return;
@@ -141,6 +136,11 @@ let luckysheetsheetrightclick = function ($t, $cur, e) {
         }, 1);
     }
     else {
+        //保存正在编辑的单元格内容
+        if (parseInt($("#luckysheet-input-box").css("top")) > 0) {
+            formula.updatecell(Store.luckysheetCellUpdate[0], Store.luckysheetCellUpdate[1]);
+        }
+
         $("#luckysheet-input-box").removeAttr("style");
         $("#luckysheet-formula-functionrange .luckysheet-formula-functionrange-highlight").remove();
     }
@@ -524,5 +524,10 @@ export function initialSheetBar(){
         $t.css({left: left + 'px', bottom: bottom + 'px'}).show();
         $("#luckysheet-input-box").removeAttr("style");
     });
+
+    // 初始化分页器
+    if (luckysheetConfigsetting.pager) {
+        pagerInit(luckysheetConfigsetting.pager)
+    }
 
 }

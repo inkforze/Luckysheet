@@ -10,6 +10,18 @@
 ## 介绍
 🚀Luckysheet ，一款纯前端类似excel的在线表格，功能强大、配置简单、完全开源。
 
+## 招聘
+字节跳动靠谱内推 - 前端工程师（上海 · 飞书）
+30 – 60K · 15薪
+1. 简历优先筛选
+2. 面试过程及时跟进
+3. 凭实力说话，薪资在行业有很强竞争力
+4. 包三餐和下午茶
+5. 有意向可以先咨询
+6. 框架: React、Electron
+
+<img src="https://minio.cnbabylon.com/public/luckysheet/feishu_jd.jpg" width = "250" alt="微信群" align="center" />
+
 ## 相关链接
  | 源码   | 文档 | Demo | 插件Demo | 论坛 |
  | ------ | -------- | ------ | ------ | ------ |
@@ -52,7 +64,8 @@
 
 ## 📖 学习资源
 
-社区提供的教程、学习资料及配套解决方案请查阅 [教程与资源](https://mengshukeji.github.io/LuckysheetDocs/zh/guide/resource.html)
+- 新用户优先阅读：[用户指引](https://github.com/mengshukeji/Luckysheet/wiki/User-Guide)
+- 社区提供的教程、学习资料及配套解决方案请查阅：[教程与资源](https://mengshukeji.github.io/LuckysheetDocs/zh/guide/resource.html)
 
 ## 📜 更新日志
 
@@ -175,6 +188,8 @@ Luckysheet是MIT许可的开源项目，其持续稳定的开发离不开这些�
 - 张铭 ¥ 200
 - 曹治军 ¥ 1
 - *特 ¥ 10
+- **权 ¥ 9.9
+- **sdmq ¥ 20
 
 ## 贡献者和感谢
 
@@ -198,6 +213,7 @@ Luckysheet是MIT许可的开源项目，其持续稳定的开发离不开这些�
 - [@swen-xiong](https://github.com/swen-xiong)
 - [@lzmch](https://github.com/lzmch)
 - [@kdevilpf](https://github.com/kdevilpf)
+- [@WJWM0316](https://github.com/WJWM0316)
 
 ## 版权信息
 [MIT](http://opensource.org/licenses/MIT)

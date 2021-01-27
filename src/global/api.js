@@ -2,7 +2,7 @@ import Store from "../store";
 import { replaceHtml, getObjType, chatatABC, luckysheetactiveCell } from "../utils/util";
 import { getSheetIndex, getluckysheet_select_save, getluckysheetfile } from "../methods/get";
 import locale from "../locale/locale";
-
+import method from './method';
 import formula from './formula';
 import func_methods from "./func_methods";
 import tooltip from "./tooltip";
@@ -99,6 +99,12 @@ export function getCellValue(row, column, options = {}) {
  * @param {Function} options.success 操作结束的回调函数
  */
 export function setCellValue(row, column, value, options = {}) {
+
+    let curv = Store.flowdata[row][column];
+
+    // Store old value for hook function
+    const oldValue = JSON.stringify(curv);
+
     if (!isRealNum(row) || !isRealNum(column)) {
         return tooltip.info('The row or column parameter is invalid.', '');
     }
@@ -113,6 +119,12 @@ export function setCellValue(row, column, value, options = {}) {
 
     if(file == null){
         return tooltip.info("The order parameter is invalid.", "");
+    }
+
+    /* cell更新前触发  */
+    if (!method.createHookFunction("cellUpdateBefore", row, column, value, isRefresh)) {
+        /* 如果cellUpdateBefore函数返回false 则不执行后续的更新 */
+        return;
     }
 
     let data = file.data;
@@ -202,6 +214,12 @@ export function setCellValue(row, column, value, options = {}) {
             setcellvalue(row, column, data, value);
         }
     }
+
+    /* cell更新后触发  */
+    setTimeout(() => {
+        // Hook function
+        method.createHookFunction("cellUpdated", row, column, JSON.parse(oldValue), Store.flowdata[row][column], isRefresh);
+    }, 0);
 
     if(file.index == Store.currentSheetIndex && isRefresh){
         jfrefreshgrid(data, [{ "row": [row, row], "column": [column, column] }]);//update data, meanwhile refresh canvas and store data to history
@@ -1574,6 +1592,47 @@ export function getRange() {
     return result;
 }
 
+/**
+ * 返回表示指定区域内所有单元格位置的数组，区别getRange方法，该方法以cell单元格(而非某块连续的区域)为单位来组织选区的数据
+ * @param   {Array}   range 可选参数，默认为当前选中区域
+ * @returns {Array}   对象数组
+ */
+export function getRangeWithFlatten(range){
+    range = range ||  getRange();
+
+    let result = [];
+
+    range.forEach(ele=>{
+        // 这个data可能是个范围或者是单个cell
+        let rs = ele.row;
+        let cs = ele.column;
+        for(let r = rs[0]; r <= rs[1]; r++){
+            for(let c = cs[0]; c <= cs[1]; c++){
+                // r c 当前的r和当前的c
+                result.push({r,c});
+            }
+        }
+    })
+    return result;
+}
+
+/**
+ * 返回表示指定区域内所有单元格内容的对象数组
+ * @param   {Array}   range 可选参数，默认为当前选中区域扁平化后的对象，结构形如[{r:0,c:0},{r:0,c:1}...]
+ * @returns {Array}   对象数组
+ */
+export function getRangeValuesWithFlatte(range){
+    range = range || getRangeWithFlatten();
+
+    let values = [];
+
+    // 获取到的这个数据不是最新的数据
+    range.forEach(item=> {
+        values.push(Store.flowdata[item.r][item.c]);
+    });
+    return values;
+}
+
 
 /**
  * 返回对应当前选区的坐标字符串数组，可能存在多个选区。
@@ -2201,7 +2260,13 @@ export function getRangeArray(dimensional, options = {}) {
         for(let r = r1; r <= r2; r++){
             for(let c = c1; c <= c2; c++){
                 let cell = data[r][c];
-                dataArr.push(cell);
+
+                if(cell == null || cell.v == null){
+                    dataArr.push(null);
+                }
+                else{
+                    dataArr.push(cell.v);
+                }
             }
         }
     }
@@ -2211,7 +2276,13 @@ export function getRangeArray(dimensional, options = {}) {
 
             for(let c = c1; c <= c2; c++){
                 let cell = data[r][c];
-                row.push(cell);
+
+                if(cell == null || cell.v == null){
+                    row.push(null);
+                }
+                else{
+                    row.push(cell.v);
+                }
             }
 
             dataArr.push(row);
@@ -2269,7 +2340,7 @@ export function getRangeJson(isFirstRowTitle, options = {}) {
             return;
         }
     }
-    let getdata = getdatabyselection(range, order);
+    let getdata = getdatabyselection(range, file.index);
     let arr = [];
     if (getdata.length === 0) {
         return;
@@ -2534,6 +2605,30 @@ export function setRangeShow(range, options = {}) {
         }];
     }
 
+    if(getObjType(range) == 'array'){
+        for(let i = 0; i < range.length; i++){
+            if(getObjType(range[i]) === 'string'){
+                if(!formula.iscelldata(range[i])){
+                    return tooltip.info("The range parameter is invalid.", "");
+                }
+                let cellrange = formula.getcellrange(range[i]);
+                range[i] = {
+                    "row": cellrange.row,
+                    "column": cellrange.column
+                }
+            }
+            else if(getObjType(range) == 'object'){
+                if(range.row == null || range.column == null){
+                    return tooltip.info("The range parameter is invalid.", "");
+                }
+                range = {
+                    "row": range.row,
+                    "column": range.column
+                };
+            }
+        }
+    }
+
     if(getObjType(range) != 'array'){
         return tooltip.info("The range parameter is invalid.", "");
     }
@@ -2548,6 +2643,16 @@ export function setRangeShow(range, options = {}) {
 
     if(file == null){
         return tooltip.info("The order parameter is invalid.", "");
+    }
+
+    for(let i = 0; i < range.length; i++){
+        let changeparam = menuButton.mergeMoveMain(range[i].column, range[i].row, range[i]);
+        if(changeparam) {
+            range[i] = {
+                "row": changeparam[1],
+                "column": changeparam[0]
+            }
+        }
     }
 
     file.luckysheet_select_save = range;
@@ -2661,30 +2766,38 @@ export function setSingleRangeFormat(attr, value, options = {}) {
         order = curSheetOrder,
     } = {...options}
 
-    if (attr == null) {
-        return tooltip.info('Arguments attr cannot be null or undefined.', '')
+    if (!attr) {
+        tooltip.info('Arguments attr cannot be null or undefined.', '')
+        return 'error';
     }
 
     if (range instanceof Array) {
-        return tooltip.info('setRangeValue only supports a single selection.', '')
+        tooltip.info('setRangeValue only supports a single selection.', '')
+        return 'error';
     }
 
-    if (typeof range === 'string' && formula.iscelldata(range)) {
-        range = formula.getcellrange(range)
+    if(getObjType(range) == 'string'){
+        if(!formula.iscelldata(range)){
+            tooltip.info("The range parameter is invalid.", "");
+            return 'error';
+        }
+
+        range = formula.getcellrange(range);
     }
 
-    let rowCount = range.row[1] - range.row[0] + 1,
-        columnCount = range.column[1] - range.column[0] + 1;
-
-    if (data.length !== rowCount || data[0].length !== columnCount) {
-        return tooltip.info('The data to be set does not match the selection', '')
+    if(getObjType(range) != 'object' || range.row == null || range.column == null){
+        tooltip.info("The range parameter is invalid.", "");
+        return 'error';
     }
 
-    for (let i = 0; i < rowCount; i++) {
-        for (let j = 0; j < columnCount; j++) {
-            let row = range.row[0] + i,
-                column = range.column[0] + j;
-            setCellFormat(row, column, attr, value, {order: order})
+    for (let r = range.row[0]; r <= range.row[1]; r++) {
+        for (let c = range.column[0]; c <= range.column[1]; c++) {
+            console.log('r',r);
+            console.log('c',c);
+            setCellValue(r, c, {[attr]: value}, {
+                order: order,
+                isRefresh: false,
+              })
         }
     }
 }
@@ -2707,11 +2820,59 @@ export function setRangeFormat(attr, value, options = {}) {
         success
     } = {...options}
 
-    if (range instanceof Array) {
-        for (let i = 0; i < range.length; i++) {
-            setSingleRangeFormat(range[i])
+    if(getObjType(range) == 'string'){
+        if(!formula.iscelldata(range)){
+            return tooltip.info("The range parameter is invalid.", "");
         }
+
+        let cellrange = formula.getcellrange(range);
+        range = [{
+            "row": cellrange.row,
+            "column": cellrange.column
+        }]
     }
+    else if(getObjType(range) == 'object'){
+        if(range.row == null || range.column == null){
+            return tooltip.info("The range parameter is invalid.", "");
+        }
+
+        range = [{
+            "row": range.row,
+            "column": range.column
+        }];
+    }
+
+    if(getObjType(range) != 'array'){
+        return tooltip.info("The range parameter is invalid.", "");
+    }
+
+    let file = Store.luckysheetfile[order];
+
+    if(file == null){
+        return tooltip.info("The order parameter is invalid.", "");
+    }
+    let sheetData = $.extend(true, [], file.data);
+    let result = []
+
+    for (let i = 0; i < range.length; i++) {
+        result.push(setSingleRangeFormat(attr, value, { range: range[i], order: order }));
+    }
+
+    if(result.some(i => i === 'error')) {
+        file.data.length = 0;
+        file.data.push(...sheetData);
+        return false;
+    }
+
+    let fileData = $.extend(true, [], file.data);
+    file.data.length = 0;
+    file.data.push(...sheetData);
+
+    if(file.index == Store.currentSheetIndex){
+        jfrefreshgrid(fileData, undefined, undefined, true, false);
+    }
+
+    luckysheetrefreshgrid();
 
     if (success && typeof success === 'function') {
         success()
@@ -3104,7 +3265,8 @@ export function cancelRangeMerge(options = {}) {
                         fv[mc_r + "_" + mc_c] = $.extend(true, {}, cell);
                     }
                     else{
-                        let cell_clone = fv[mc_r + "_" + mc_c];
+                        // let cell_clone = fv[mc_r + "_" + mc_c];
+                        let cell_clone = JSON.parse(JSON.stringify(fv[mc_r + "_" + mc_c]));
 
                         delete cell_clone.v;
                         delete cell_clone.m;
@@ -4705,6 +4867,10 @@ export function setSheetDelete(options = {}) {
         return tooltip.info("The order parameter is invalid.", "");
     }
 
+    if(Store.luckysheetfile.length === 1){
+        return tooltip.info(locale().sheetconfig.noMoreSheet, "");
+    }
+
     sheetmanage.deleteSheet(file.index);
 
     setTimeout(() => {
@@ -5273,7 +5439,8 @@ export function hideGridLines(options = {}){
  * @param {Function} options.success 操作结束的回调函数
  */
 export function refresh(options = {}) {
-    luckysheetrefreshgrid();
+    // luckysheetrefreshgrid();
+    jfrefreshgrid();
 
     let {
         success
@@ -5487,6 +5654,39 @@ export function setWorkbookName(name, options = {}) {
     if (success && typeof success === 'function') {
         success();
     }
+}
+
+/**
+ * 获取工作簿名称
+ * @param   {Object}    options         可选参数
+ * @param   {Function}  options.success 操作结束的回调函数
+ * @returns {String}    返回工作簿名称，如果读取失败则返回空字符串并弹窗提示
+ */
+export function getWorkbookName(options = {}) {
+
+    let name = "";
+    let element = $("#luckysheet_info_detail_input");
+
+    if(element.length == 0){
+
+        tooltip.info('Failed to get workbook name, label loading failed!');
+        return name;
+
+    }
+
+    name = $.trim(element.val());
+
+    let {
+        success
+    } = {...options}
+
+    setTimeout(() => {
+        if (success && typeof success === 'function') {
+            success()
+        }
+    }, 1)
+
+    return name;
 }
 
 
@@ -6400,4 +6600,70 @@ export function getTxtByRange(range=Store.luckysheet_select_save){
         range = [range];
     }
     return conditionformat.getTxtByRange(range);
+}
+
+/**
+ * 初始化分页器
+ * @param {Object} config 分页器配置
+ * @param {Number} config.pageIndex 当前的页码
+ * @param {Number} config.pageSize 每页显示多少条数据
+ * @param {Array} config.selectOption 选择每页的条数
+ * @param {Number} config.total 总条数
+ */
+export function pagerInit (config) {
+    $('#luckysheet-bottom-pager').remove()
+    $('#luckysheet-sheet-area').append('<div id="luckysheet-bottom-pager" style="font-size: 14px; margin-left: 10px; display: inline-block;"></div>')
+    $("#luckysheet-bottom-pager").sPage({
+        page: config.pageIndex, //当前页码，必填
+        total: config.total, //数据总条数，必填
+        selectOption: config.selectOption, // 选择每页的行数，
+        pageSize: config.pageSize, //每页显示多少条数据，默认10条
+        showTotal: true, // 是否显示总数
+        showSkip: config.showSkip || true, //是否显示跳页，默认关闭：false
+        showPN: config.showPN || true, //是否显示上下翻页，默认开启：true
+        backFun: function (page) {
+            page.pageIndex = page.page
+            if(!method.createHookFunction("onTogglePager", page)){ return; }
+        }
+    });
+}
+
+/**
+ * 刷新公式
+ * @param {Function} success 回调函数
+ */
+export function refreshFormula (success) {
+    formula.execFunctionGroupForce(true);
+    luckysheetrefreshgrid()
+    setTimeout(() => {
+      if (success && typeof success === 'function') {
+          success();
+      }
+    })
+}
+
+/**
+ * 刷新状态栏的状态
+ * @param {Array}  data             操作数据
+ * @param {Number} r                指定的行
+ * @param {Number} c                指定的列
+ * @param {Function} success        回调函数
+ */
+export function refreshMenuButtonFocus(data ,r,c , success){
+    data = data || Store.flowdata;
+    if(r == null && c == null){
+        /* 获取选取范围 */
+        let last = Store.luckysheet_select_save[Store.luckysheet_select_save.length -1];
+
+        r = last.row_focus || last.row[0];
+        c = last.column_focus || last.column[0];
+    }
+
+    menuButton.menuButtonFocus(data, r, c);
+
+    setTimeout(() => {
+        if (success && typeof success === 'function') {
+            success();
+        }
+    })
 }

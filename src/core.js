@@ -71,6 +71,7 @@ luckysheet.create = function (setting) {
     Store.luckysheetfile = extendsetting.data;
     Store.defaultcolumnNum = extendsetting.column;
     Store.defaultrowNum = extendsetting.row;
+    Store.defaultFontSize = extendsetting.defaultFontSize;
     Store.fullscreenmode = extendsetting.fullscreenmode;
     Store.lang = extendsetting.lang; //language
     Store.allowEdit = extendsetting.allowEdit;
@@ -133,6 +134,10 @@ luckysheet.create = function (setting) {
     luckysheetConfigsetting.title = extendsetting.title;
     luckysheetConfigsetting.container = extendsetting.container;
     luckysheetConfigsetting.hook = extendsetting.hook;
+
+    luckysheetConfigsetting.pager = extendsetting.pager;
+
+    luckysheetConfigsetting.initShowsheetbarConfig = false;
 
     if (Store.lang === 'zh') flatpickr.localize(Mandarin.zh);
 

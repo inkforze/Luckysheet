@@ -585,7 +585,7 @@ Use note:
  
 - **Parameter**：
 	
-	- {Number} [columnInfo]: Correspondence between the number of columns and the width
+	- {Object} [columnInfo]: Correspondence between the number of columns and the width
 	
 	- {PlainObject} [setting]: optional parameters
 		+ {Number} [order]: Worksheet subscript; the default value is the current worksheet subscript
@@ -726,6 +726,160 @@ Use note:
 		]
 		```
 
+------------
+
+
+### getRangeWithFlatten()
+ 
+- **Explanation**：
+
+	Returns an array representing the positions of all cells in the specified area, which is different from the getrange method, which organizes the data of the selection by cell (rather than a continuous area).
+
+- **Usage**:
+
+	- Select the specified area in the table, and then execute
+		
+		`luckysheet.getRange()`
+		
+		The returned result is:
+		```json
+		[
+			{"row":[0,0],"column":[0,2]},
+			{"row":[1,1],"column":[0,0]},
+			{"row":[3,3],"column":[0,0]}
+		]
+		```
+		Where，{"row":[0,0],"column":[0,2]} denote a whole continuous region.
+
+	- Select the area above in the table and execute
+		
+		`luckysheet.getRangeWithFlatten()`
+		
+		The returned result is:
+		```json
+		[
+			{"r":0,"c":0},
+			{"r":0,"c":1},
+			{"r":0,"c":2},
+			{"r":1,"c":0},
+			{"r":3,"c":0}
+		]
+		```
+
+------------
+
+
+### getRangeValuesWithFlatte()
+ 
+- **Explanation**：
+
+	Returns an array of objects representing the contents of all cells in a specified range
+
+- **Usage**:
+
+	- Select the specified area in the table, and then execute
+		
+		`luckysheet.getRange()`
+		
+		The returned result is:
+		```json
+		[
+			{"row":[0,0],"column":[0,2]},
+			{"row":[1,1],"column":[0,0]},
+			{"row":[3,3],"column":[0,0]}
+		]
+		```
+		Where，{"row":[0,0],"column":[0,2]} denote a whole continuous region.
+
+	- Select the area above in the table and execute
+		
+		`luckysheet.getRangeValuesWithFlatte()`
+		
+		The returned result is:
+		```json
+		[
+			{
+				"bg": null,
+				"bl": 0,
+				"it": 0,
+				"ff": 0,
+				"fs": 11,
+				"fc": "rgb(51, 51, 51)",
+				"ht": 1,
+				"vt": 1,
+				"v": 1,
+				"ct": {
+					"fa": "General",
+					"t": "n"
+				},
+				"m": "1"
+			},
+			{
+				"bg": null,
+				"bl": 0,
+				"it": 0,
+				"ff": 0,
+				"fs": 11,
+				"fc": "rgb(51, 51, 51)",
+				"ht": 1,
+				"vt": 1,
+				"v": 2,
+				"ct": {
+					"fa": "General",
+					"t": "n"
+				},
+				"m": "2"
+			},
+			{
+				"bg": null,
+				"bl": 0,
+				"it": 0,
+				"ff": 0,
+				"fs": 11,
+				"fc": "rgb(51, 51, 51)",
+				"ht": 1,
+				"vt": 1,
+				"v": 3,
+				"ct": {
+					"fa": "General",
+					"t": "n"
+				},
+				"m": "3"
+			},
+			{
+				"v": "Background",
+				"ct": {
+					"fa": "General",
+					"t": "g"
+				},
+				"m": "Background",
+				"bg": null,
+				"bl": 1,
+				"it": 0,
+				"ff": 0,
+				"fs": 11,
+				"fc": "rgb(51, 51, 51)",
+				"ht": 1,
+				"vt": 1
+			},
+			{
+				"v": "Border",
+				"ct": {
+					"fa": "General",
+					"t": "g"
+				},
+				"m": "Border",
+				"bg": null,
+				"bl": 1,
+				"it": 0,
+				"ff": 0,
+				"fs": 11,
+				"fc": "rgb(51, 51, 51)",
+				"ht": 1,
+				"vt": 1
+			}
+		]
+		```
 ------------
 
 ### getRangeAxis()
@@ -1776,9 +1930,9 @@ Use note:
 		+ `"flipLeftRight"`: flip left and right
 		+ `"flipClockwise"`: rotate clockwise
 		+ `"flipCounterClockwise"`: rotate counterclockwise
-		+ `"Transpose"`: Transpose
-		+ `"DeleteZeroByRow"`: delete 0 values at both ends by row
-		+ `"DeleteZeroByColumn"`: delete zero values at both ends by column
+		+ `"transpose"`: Transpose
+		+ `"deleteZeroByRow"`: delete 0 values at both ends by row
+		+ `"deleteZeroByColumn"`: delete zero values at both ends by column
 		+ `"removeDuplicateByRow"`: delete duplicate values by row
 		+ `"removeDuplicateByColumn"`: remove duplicate values by column
 		+ `"newMatrix"`: Produce a new matrix
@@ -2358,8 +2512,6 @@ Use note:
 
 ### setWorkbookName(name [,setting])
 
-[todo]
-
 - **Parameter**：
 
 	- {Number} [name]: Workbook name
@@ -2369,6 +2521,19 @@ Use note:
 - **Explanation**：
 	
 	Set workbook name
+
+------------
+
+### getWorkbookName(name [,setting])
+
+- **Parameter**：
+
+	- {PlainObject} [setting]: optional parameters
+		+ {Function} [success]: callback function for the end of the operation
+
+- **Explanation**：
+	
+	get workbook name
 
 ------------
 
@@ -2406,17 +2571,28 @@ Use note:
 
 ### refreshFormula([setting])
 
-[todo]
-
 - **Parameter**：
 
-	- {PlainObject} [setting]: optional parameters
-        + {Object | String} [range]: Set the target selection range of the parameter. The supported selection format is `"A1:B2"`, `"sheetName!A1:B2"` or `{row:[0,1], column:[0,1]}`, allows an array of multiple selections; the default is the current selection ;The default is the entire current worksheet
-        + {Function} [success]: callback function for the end of the operation
+	-  {Function} [success]: callback function for the end of the operation
 
 - **Explanation**：
 	
-	Force refresh formula. When you directly modify the values of multiple cells without triggering a refresh, and these cells are associated with formulas, you can use this API to force a formula refresh to be triggered at the end. It is generally recommended to specify the affected cell range to prevent For performance issues, if you can't determine it, leave it blank to keep the entire worksheet traversed and refreshed.
+	Force refresh formula. When you directly modify the values of multiple cells without triggering a refresh, and these cells are associated with formulas, you can use this API to force a formula refresh to be triggered at the end.
+
+------------
+
+### refreshMenuButtonFocus([data],[r],[c],[success])
+
+- **Parameter**：
+
+	- {Array}  [data]: Operational data
+	- {Number} [r]: Specified row
+	- {Number} [c]: Specified column
+	- {Function} [success]: callback function for the end of the operation
+
+- **Explanation**：
+	
+	Refreshes the top status bar status of the specified cell.
 
 ------------
 
