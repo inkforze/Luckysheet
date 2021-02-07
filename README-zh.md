@@ -89,12 +89,12 @@
 通过CDN引入依赖
 
 ```
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/css/pluginsCss.css' />
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/plugins.css' />
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/css/luckysheet.css' />
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/assets/iconfont/iconfont.css' />
-<script src="https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/js/plugin.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/luckysheet/dist/luckysheet.umd.js"></script>
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/plugins/css/pluginsCss.css' />
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/plugins/plugins.css' />
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/css/luckysheet.css' />
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/assets/iconfont/iconfont.css' />
+<script src="https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/plugins/js/plugin.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/luckysheet.umd.js"></script>
 ```
 ### 第二步
 指定一个表格容器
@@ -138,6 +138,7 @@ npm run build
 - [鲁班h5](https://github.com/ly525/luban-h5)
 - [excelize](https://github.com/360EntSecGroup-Skylar/excelize)
 - [h5-Dooring](https://github.com/MrXujiang/h5-Dooring)
+- [Furion](https://gitee.com/monksoul/Furion)
 
 ## 交流
 
@@ -190,6 +191,10 @@ Luckysheet是MIT许可的开源项目，其持续稳定的开发离不开这些�
 - *特 ¥ 10
 - **权 ¥ 9.9
 - **sdmq ¥ 20
+- *旭 ¥ 10
+- Quentin ¥ 20
+- 周宇凡 ¥ 100
+- *超 ¥ 10
 
 ## 贡献者和感谢
 

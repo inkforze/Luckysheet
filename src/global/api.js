@@ -21,7 +21,7 @@ import { isRealNull, valueIsError, isRealNum, isEditMode, hasPartMC } from "./va
 import { isdatetime, diff } from "./datecontroll";
 import { getBorderInfoCompute } from './border';
 import { luckysheetDrawMain } from './draw';
-
+import pivotTable from '../controllers/pivotTable';
 import server from "../controllers/server";
 import menuButton from '../controllers/menuButton';
 import selection from "../controllers/selection";
@@ -164,10 +164,10 @@ export function setCellValue(row, column, value, options = {}) {
     }
     else if(value instanceof Object){
         let curv = {};
-        let cell = data[row][column];
-        if(isRealNull(cell)){
-            cell = {};
+        if(isRealNull(data[row][column])){
+            data[row][column] = {};
         }
+        let cell = data[row][column];
         if(value.f!=null && value.v==null){
             curv.f = value.f;
             if(value.ct!=null){
@@ -1577,7 +1577,8 @@ export function getDefaultColWidth(options = {}) {
  * @returns {Array}
  */
 export function getRange() {
-    let rangeArr = Store.luckysheet_select_save;
+    let rangeArr = JSON.parse(JSON.stringify(Store.luckysheet_select_save));
+
     let result = [];
 
     for (let i = 0; i < rangeArr.length; i++) {
@@ -1641,7 +1642,7 @@ export function getRangeValuesWithFlatte(range){
  */
 export function getRangeAxis() {
     let result = [];
-    let rangeArr = Store.luckysheet_select_save;
+    let rangeArr = JSON.parse(JSON.stringify(Store.luckysheet_select_save));
     let sheetIndex = Store.currentSheetIndex;
 
     rangeArr.forEach(ele=>{
@@ -1691,6 +1692,7 @@ export function getRangeHtml(options = {}) {
         order = getSheetIndex(Store.currentSheetIndex),
         success
     } = {...options}
+    range = JSON.parse(JSON.stringify(range));
 
     if(getObjType(range) == 'string'){
         if(!formula.iscelldata(range)){
@@ -1848,8 +1850,8 @@ export function getRangeHtml(options = {}) {
     let cpdata = "";
     let colgroup = "";
 
-    rowIndexArr = rowIndexArr.sort();
-    colIndexArr = colIndexArr.sort();
+    rowIndexArr = rowIndexArr.sort((a, b) => a - b);
+    colIndexArr = colIndexArr.sort((a, b) => a - b);
 
     for (let i = 0; i < rowIndexArr.length; i++) {
         let r = rowIndexArr[i];
@@ -2395,7 +2397,7 @@ export function getRangeDiagonal(type, options = {}) {
     }
 
     let curSheetOrder = getSheetIndex(Store.currentSheetIndex);
-    let curRange = Store.luckysheet_select_save;
+    let curRange = JSON.parse(JSON.stringify(Store.luckysheet_select_save));
     let {
         column = 1,
         range = curRange,
@@ -2498,7 +2500,7 @@ export function getRangeDiagonal(type, options = {}) {
  */
 export function getRangeBoolean(options = {}) {
     let curSheetOrder = getSheetIndex(Store.currentSheetIndex);
-    let curRange = Store.luckysheet_select_save;
+    let curRange = JSON.parse(JSON.stringify(Store.luckysheet_select_save));
     let {
         range = curRange,
         order = curSheetOrder
@@ -2813,7 +2815,7 @@ export function setSingleRangeFormat(attr, value, options = {}) {
  */
 export function setRangeFormat(attr, value, options = {}) {
     let curSheetOrder = getSheetIndex(Store.currentSheetIndex);
-    let curRange = Store.luckysheet_select_save;
+    let curRange = JSON.parse(JSON.stringify(Store.luckysheet_select_save));
     let {
         range = curRange,
         order = curSheetOrder,
@@ -2848,10 +2850,6 @@ export function setRangeFormat(attr, value, options = {}) {
 
     let file = Store.luckysheetfile[order];
 
-    if(file == null){
-        return tooltip.info("The order parameter is invalid.", "");
-    }
-    let sheetData = $.extend(true, [], file.data);
     let result = []
 
     for (let i = 0; i < range.length; i++) {
@@ -2875,7 +2873,6 @@ export function setRangeFormat(attr, value, options = {}) {
     luckysheetrefreshgrid();
 
     if (success && typeof success === 'function') {
-        success()
     }
 }
 
@@ -2966,7 +2963,7 @@ export function setRangeMerge(type, options = {}) {
     }
 
     let curSheetOrder = getSheetIndex(Store.currentSheetIndex),
-        curRange = Store.luckysheet_select_save;
+        curRange = JSON.parse(JSON.stringify(Store.luckysheet_select_save));
     let {
         range = curRange,
         order = curSheetOrder,
@@ -3550,6 +3547,8 @@ export function setRangeConditionalFormatDefault(conditionName, conditionValue, 
         success
     } = {...options}
 
+    cellrange = JSON.parse(JSON.stringify(cellrange));
+
     let file = Store.luckysheetfile[order];
     let data = file.data;
 
@@ -3816,6 +3815,7 @@ export function setRangeConditionalFormat(type, options = {}) {
         success
     } = {...options}
 
+    cellrange = JSON.parse(JSON.stringify(cellrange));
     let file = Store.luckysheetfile[order];
 
     if(file == null){
@@ -4137,6 +4137,7 @@ export function clearRange(options = {}) {
         success
     } = {...options}
 
+    range = JSON.parse(JSON.stringify(range));
     if(getObjType(range) == 'string'){
         if(!formula.iscelldata(range)){
             return tooltip.info("The range parameter is invalid.", "");
@@ -6611,16 +6612,20 @@ export function getTxtByRange(range=Store.luckysheet_select_save){
  * @param {Number} config.total 总条数
  */
 export function pagerInit (config) {
+    const {prevPage, nextPage, total} = locale().button;
     $('#luckysheet-bottom-pager').remove()
-    $('#luckysheet-sheet-area').append('<div id="luckysheet-bottom-pager" style="font-size: 14px; margin-left: 10px; display: inline-block;"></div>')
+    $('#luckysheet-sheet-content').after('<div id="luckysheet-bottom-pager" style="font-size: 14px; margin-left: 10px; display: inline-block;"></div>')
     $("#luckysheet-bottom-pager").sPage({
         page: config.pageIndex, //当前页码，必填
         total: config.total, //数据总条数，必填
         selectOption: config.selectOption, // 选择每页的行数，
         pageSize: config.pageSize, //每页显示多少条数据，默认10条
-        showTotal: true, // 是否显示总数
-        showSkip: config.showSkip || true, //是否显示跳页，默认关闭：false
-        showPN: config.showPN || true, //是否显示上下翻页，默认开启：true
+        showTotal: config.showTotal, // 是否显示总数，默认关闭：false
+        showSkip: config.showSkip, //是否显示跳页，默认关闭：false
+        showPN: config.showPN, //是否显示上下翻页，默认开启：true
+        prevPage: config.prevPage || prevPage, //上翻页文字描述，默认"上一页"
+        nextPage: config.nextPage || nextPage, //下翻页文字描述，默认"下一页"
+        totalTxt: config.totalTxt || total + config.total, // 数据总条数文字描述，{total}为占位符，默认"总共：{total}"
         backFun: function (page) {
             page.pageIndex = page.page
             if(!method.createHookFunction("onTogglePager", page)){ return; }
@@ -6640,6 +6645,53 @@ export function refreshFormula (success) {
           success();
       }
     })
+}
+
+/**
+ * 更新sheet数据
+ * @param {Array} data 工作簿配置，可以包含多个表
+ * @param {Object} options 可选参数
+ * @param {Function} options.success 操作结束的回调函数
+ * 
+ */
+export function updataSheet (options = {}) {
+    let {data, success} = options
+    let files = Store.luckysheetfile
+    for (let i = 0; i < data.length; i++) {
+        for (let j = 0; j < files.length; j++) {
+            if (files[j].index === data[i].index) {
+                files[j] = data[i]
+            }
+        }
+    }
+    let file = files[sheetmanage.getSheetIndex(Store.currentSheetIndex)],
+        sheetData = sheetmanage.buildGridData(file);
+    file.data = sheetData
+
+    if (!!file.isPivotTable) {
+        Store.luckysheetcurrentisPivotTable = true;
+        if (!isPivotInitial) {
+            pivotTable.changePivotTable(index);
+        }
+    }
+    else{
+        Store.luckysheetcurrentisPivotTable = false;
+        $("#luckysheet-modal-dialog-slider-pivot").hide();
+        luckysheetsizeauto(false);
+    }
+    sheetmanage.mergeCalculation(file["index"]);
+    sheetmanage.setSheetParam();
+    setTimeout(function () {
+        sheetmanage.showSheet();
+        sheetmanage.restoreCache();
+        formula.execFunctionGroupForce(luckysheetConfigsetting.forceCalculation);
+        sheetmanage.restoreSheetAll(Store.currentSheetIndex);
+        luckysheetrefreshgrid();
+        if (success && typeof success === 'function') {
+            success();
+        }
+    }, 1);
+    server.saveParam("shs", null, Store.currentSheetIndex);
 }
 
 /**
@@ -6666,4 +6718,25 @@ export function refreshMenuButtonFocus(data ,r,c , success){
             success();
         }
     })
+}
+
+/**
+ * 检查选区内所有cell指定类型的状态是否满足条件（主要是粗体、斜体、删除线和下划线等等）
+ * @param {String}  type            类型
+ * @param {String}  status          目标状态值
+ */
+export function checkTheStatusOfTheSelectedCells(type,status){
+
+    /* 获取选区内所有的单元格-扁平后的处理 */
+    let cells = getRangeWithFlatten();  
+
+    let flag = cells.every(({r,c})=>{
+        let cell = Store.flowdata[r][c];
+        if(cell == null){
+            return false;
+        }
+        return cell[type] == status;
+    })
+
+    return flag;
 }

@@ -8918,6 +8918,9 @@ export default {
         update:"Actualizar",
         delete:"Eliminar",
         insert:"Insertar",
+        prevPage: "Previous",
+        nextPage: "Next",
+        total: "total:"
     },
     paint:{
         start: 'Inicio clonar formato',
@@ -8941,7 +8944,7 @@ export default {
         detailSave: 'Cache local restaurado',
         row: '',
         column: '',
-        loading:"Cargando",
+        loading:"Cargando...",
 
         copy:"Copiar",
         return:"Salir",

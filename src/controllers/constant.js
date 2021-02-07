@@ -209,23 +209,25 @@ const gridHTML = function(){
                                 </table> 
                             </div> 
                             <div class="luckysheet-sheet-area luckysheet-noselected-text" id="luckysheet-sheet-area">
-                                <div id="luckysheet-sheets-add" class="luckysheet-sheets-add lucky-button-custom"><i class="iconfont luckysheet-iconfont-jia1"></i></div>
-                                <div id="luckysheet-sheets-m" class="luckysheet-sheets-m lucky-button-custom"><i class="iconfont luckysheet-iconfont-caidan2"></i></div>
-                                <div class="luckysheet-sheet-container" id="luckysheet-sheet-container">
-                                    <div class="docs-sheet-fade docs-sheet-fade-left" style="display: none;">
-                                        <div class="docs-sheet-fade3"></div>
-                                        <div class="docs-sheet-fade2"></div>
-                                        <div class="docs-sheet-fade1"></div>
+                                <div id="luckysheet-sheet-content">
+                                    <div id="luckysheet-sheets-add" class="luckysheet-sheets-add lucky-button-custom"><i class="iconfont luckysheet-iconfont-jia1"></i></div>
+                                    <div id="luckysheet-sheets-m" class="luckysheet-sheets-m lucky-button-custom"><i class="iconfont luckysheet-iconfont-caidan2"></i></div>
+                                    <div class="luckysheet-sheet-container" id="luckysheet-sheet-container">
+                                        <div class="docs-sheet-fade docs-sheet-fade-left" style="display: none;">
+                                            <div class="docs-sheet-fade3"></div>
+                                            <div class="docs-sheet-fade2"></div>
+                                            <div class="docs-sheet-fade1"></div>
+                                        </div>
+                                        <div class="docs-sheet-fade docs-sheet-fade-right" style="display: none;">
+                                            <div class="docs-sheet-fade1"></div>
+                                            <div class="docs-sheet-fade2"></div>
+                                            <div class="docs-sheet-fade3"></div>
+                                        </div>
+                                        <div class="luckysheet-sheet-container-c" id="luckysheet-sheet-container-c"></div>
                                     </div>
-                                    <div class="docs-sheet-fade docs-sheet-fade-right" style="display: none;">
-                                        <div class="docs-sheet-fade1"></div>
-                                        <div class="docs-sheet-fade2"></div>
-                                        <div class="docs-sheet-fade3"></div>
-                                    </div>
-                                    <div class="luckysheet-sheet-container-c" id="luckysheet-sheet-container-c"></div>
+                                    <div id="luckysheet-sheets-leftscroll" class="luckysheet-sheets-scroll lucky-button-custom"><i class="fa fa-caret-left"></i></div>
+                                    <div id="luckysheet-sheets-rightscroll" class="luckysheet-sheets-scroll lucky-button-custom"><i class="fa fa-caret-right"></i></div>
                                 </div>
-                                <div id="luckysheet-sheets-leftscroll" class="luckysheet-sheets-scroll lucky-button-custom"><i class="fa fa-caret-left"></i></div>
-                                <div id="luckysheet-sheets-rightscroll" class="luckysheet-sheets-scroll lucky-button-custom"><i class="fa fa-caret-right"></i></div>
                             </div> 
                         </div> 
                         <div class="luckysheet-stat-area"> 
@@ -1575,11 +1577,107 @@ function menuToolBar (){
         `;
 } 
 
-const luckysheetlodingHTML = function(){ 
-    const _locale = locale()
-    const info =_locale.info;
-    return'<div id="luckysheetloadingdata" style="width:100%;text-align:center;position:absolute;top:0px;height:100%;font-size: 16px;z-index:1000000000;background:#fff;"><div style="position:relative;top:45%;width:100%;"> <div class="luckysheetLoaderGif"></div>  <span>'+info.loading+'...</span></div></div>';
+
+function customLoadingConfig() {
+    const _locale = locale();
+    const info = _locale.info;
+    const config = {
+        enable: true,
+        image: 'image://css/loading.gif',
+        text: info.loading,
+        viewBox: "32 32 64 64", // 只有为path时，才会使用
+        imageClass: '',
+        textClass: '',
+        customClass: ''
+    }
+    if (JSON.stringify(luckysheetConfigsetting.loading) !== '{}') {
+        Object.assign(config, luckysheetConfigsetting.loading);
+    }
+    return config;
 }
+
+const luckysheetloadingImage = function (config) {
+    if(typeof config.image==="function"){
+        return config.image()
+    }
+    const regE = new RegExp("^(image|path)://");
+    const regResult = regE.exec(config.image);
+    let imageHtml = '';
+    if (regResult !== null) {
+        const prefix = regResult[0];
+        const type = regResult[1];
+        const imageStr = regResult.input.substring(prefix.length);
+        switch (type) {
+            case "image":
+                imageHtml = `<div class="image-type" style="background-image: url(${imageStr});"></div>`;
+                break;
+            case "path":
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute("class", "path-type");
+                svg.setAttribute("viewBox", config.viewBox);
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", imageStr);
+                path.setAttribute("fill", "currentColor");
+                svg.appendChild(path);
+                imageHtml = svg.outerHTML;
+                break;
+            default:
+                break;
+        }
+    }
+    return imageHtml;
+}
+
+const luckysheetlodingHTML = function (target, coverConfig) {
+    if (!target) {
+        return;
+    }
+    const config = customLoadingConfig();
+    if (coverConfig && JSON.stringify(coverConfig) !== "{}") {
+        Object.assign(config, coverConfig);
+    }
+    if (typeof config.enable === "boolean" && config.enable === false) {
+        return {
+            el: '',
+            show: show,
+            close: close
+        }
+    }
+    const imageHtml = luckysheetloadingImage(config);
+    const id = "luckysheet-loading-" + uuid.v4();
+    const loadingHtml = `
+        <div class="luckysheet-loading-content"> 
+            <div class="${config.imageClass} luckysheet-loading-image">
+                ${imageHtml}
+            </div>
+            <div class="${config.textClass} luckysheet-loading-text">
+            <span>${config.text}</span>
+            </div>    
+        </div>`;
+    const loading = document.createElement("div");
+    loading.id = id;
+    loading.className = "luckysheet-loading-mask " + config.customClass;
+    $(loading).html(loadingHtml);
+    $(target).append(loading);
+
+    function show() {
+        if(id){
+            $("#" + id).show();
+        }     
+    }
+
+    function close() {
+        if(id){
+            $("#" + id).hide();
+        }  
+    }
+    return {
+        el: loading,
+        show: show,
+        close: close
+    };
+}
+
 // var menusetting = {
 //     menu_selectall: '<div id="luckysheet-selectall-btn-title"><i class="fa fa-i-cursor"></i> 全选</div>',
 //     menu_copy: '<div id="luckysheet-copy-btn-title"><i class="fa fa-copy"></i> 复制</div>',

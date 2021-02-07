@@ -8919,6 +8919,9 @@ export default {
         update:"Update",
         delete:"Delete",
         insert:"Insert",
+        prevPage: "Previous",
+        nextPage: "Next",
+        total: "total:"
     },
     paint:{
         start: 'Paint format start',
@@ -8942,7 +8945,7 @@ export default {
         detailSave: 'Local cache restored',
         row: '',
         column: '',
-        loading:"Loading",
+        loading:"Loading...",
 
         copy:"Copy",
         return:"Exit",

@@ -503,6 +503,11 @@ export default function luckysheetHandler() {
                     //按住ctrl 选择选区时  先处理上一个选区
                     let vText = $("#luckysheet-rich-text-editor").text();
                     
+                    if(vText[vText.length -1 ] === ")"){
+                        vText = vText.substr(0,vText.length - 1); //先删除最后侧的圆括号) 
+                    }
+                    
+
                     if(vText.length > 0){
                         let lastWord = vText.substr(vText.length-1,1);
                         if(lastWord!="," && lastWord!="=" && lastWord!="("){
@@ -521,7 +526,9 @@ export default function luckysheetHandler() {
                             formula.functionRangeIndex = textRange;
                         }
 
-                        $("#luckysheet-rich-text-editor").html(vText);
+                        /* 在显示前重新 + 右侧的圆括号) */
+
+                        $("#luckysheet-rich-text-editor").html(vText + ")");
 
                         formula.canceFunctionrangeSelected();
                         formula.createRangeHightlight();
@@ -531,7 +538,7 @@ export default function luckysheetHandler() {
                     formula.rangedrag_column_start = false;
                     formula.rangedrag_row_start = false;
 
-                    $("#luckysheet-functionbox-cell").html(vText);
+                    $("#luckysheet-functionbox-cell").html(vText + ")");
                     formula.rangeHightlightselected($("#luckysheet-rich-text-editor"));
 
                     //再进行 选区的选择
@@ -5401,7 +5408,6 @@ export default function luckysheetHandler() {
                             let $td = $(this);
                             let cell = {};
                             let txt = $td.text();
-
                             if ($.trim(txt).length == 0) {
                                 cell.v = null;
                                 cell.m = "";
@@ -5614,6 +5620,7 @@ export default function luckysheetHandler() {
             }
         }
         else if($(e.target).closest('#luckysheet-rich-text-editor').length > 0) {
+            
             // 阻止默认粘贴
             e.preventDefault();
 
@@ -5622,7 +5629,6 @@ export default function luckysheetHandler() {
                 clipboardData = e.originalEvent.clipboardData;
             }
             let text =  clipboardData.getData('text/plain');
-            
             // 插入
             document.execCommand("insertText", false, text);
         }

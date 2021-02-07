@@ -81,12 +81,12 @@ Please make sure to read the[ Contributing Guide](https://mengshukeji.github.io/
 ### First step
 Introduce dependencies through CDN
 ```
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/css/pluginsCss.css' />
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/plugins.css' />
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/css/luckysheet.css' />
-<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/assets/iconfont/iconfont.css' />
-<script src="https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/js/plugin.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/luckysheet/dist/luckysheet.umd.js"></script>
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/plugins/css/pluginsCss.css' />
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/plugins/plugins.css' />
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/css/luckysheet.css' />
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/assets/iconfont/iconfont.css' />
+<script src="https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/plugins/js/plugin.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/luckysheet@latest/dist/luckysheet.umd.js"></script>
 ```
 ### Second step
 Specify a table container
@@ -131,6 +131,7 @@ npm run build
 - [luban-h5](https://github.com/ly525/luban-h5)
 - [excelize](https://github.com/360EntSecGroup-Skylar/excelize)
 - [h5-Dooring](https://github.com/MrXujiang/h5-Dooring)
+- [Furion](https://gitee.com/monksoul/Furion)
 
 ## Communication
 - [Github Discussions](https://github.com/mengshukeji/Luckysheet/discussions)
@@ -174,6 +175,10 @@ Funds donated via Patreon go directly to support mengshukeji's work on Luckyshee
 - *特 ¥ 10
 - **权 ¥ 9.9
 - **sdmq ¥ 20
+- *旭 ¥ 10
+- Quentin ¥ 20
+- 周宇凡 ¥ 100
+- *超 ¥ 10
 
 ## Authors and acknowledgment
 
